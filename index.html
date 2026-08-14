@@ -49,6 +49,74 @@
         .cat-card { background: var(--card-bg); padding: 20px; text-align: center; border-radius: 8px; border: 1px solid #333; cursor: pointer; transition: 0.3s; }
         .cat-card:hover { border-color: var(--primary); transform: translateY(-3px); }
         .cat-card i { font-size: 2rem; color: var(--primary); margin-bottom: 8px; }
+        /* Contenedor del Carrusel con Flechas */
+        .carousel-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .product-carousel {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding: 10px 0;
+            width: 100%;
+        }
+
+        /* Ocultar la barra de scroll visual */
+        .product-carousel::-webkit-scrollbar {
+            display: none;
+        }
+        .product-carousel {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Cada tarjeta mantendrá un ancho fijo para mostrar exactamente 5 en pantalla grande */
+        .product-carousel .product-card {
+            min-width: calc((100% - 60px) / 5);
+            box-sizing: border-box;
+        }
+
+        /* Estilo de las Flechas Navegadoras */
+        .arrow-btn {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.85);
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            font-size: 1.2rem;
+            transition: 0.3s;
+        }
+
+        .arrow-btn:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .arrow-left {
+            left: -15px;
+            display: none; /* Inicia oculta porque estamos al principio */
+        }
+
+        .arrow-right {
+            right: -15px;
+        }
+
+        @media (max-width: 1024px) {
+            .product-carousel .product-card {
+                min-width: 200px;
+            }
+        }
 
         /* Grilla de Productos */
         .products-section { padding: 20px 5%; }
@@ -74,6 +142,39 @@
         }
     </style>
 </head>
+<script>
+        const carousel = document.getElementById('carousel');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        function scrollCarousel(direction) {
+            // Desplaza el ancho completo visible del contenedor (los 5 productos)
+            const scrollAmount = carousel.clientWidth;
+            carousel.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+
+        // Evalúa la posición del scroll para mostrar u ocultar las flechas
+        carousel.addEventListener('scroll', () => {
+            const maxScrollLeft = carousel.scrollWidth - carousel.clientWidth;
+            
+            // Oculta/Muestra flecha izquierda
+            if (carousel.scrollLeft <= 10) {
+                prevBtn.style.display = 'none';
+            } else {
+                prevBtn.style.display = 'flex';
+            }
+
+            // Oculta/Muestra flecha derecha al llegar al final
+            if (carousel.scrollLeft >= maxScrollLeft - 10) {
+                nextBtn.style.display = 'none';
+            } else {
+                nextBtn.style.display = 'flex';
+            }
+        });
+    </script>
 <body>
 
     <!-- Top Bar -->
@@ -119,48 +220,90 @@
         </div>
     </section>
 
-    <!-- Productos Recién Agregados -->
+    <!-- Productos Recién Agregados (Carrusel Deslizante) -->
     <section class="categories-slider">
         <h2 class="section-title">Productos Recién Agregados</h2>
-        <div class="cat-grid" style="grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));">
+        <div class="carousel-wrapper">
+            <button class="arrow-btn arrow-left" id="prevBtn" onclick="scrollCarousel(-1)">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
             
-            <!-- Producto 1 -->
-            <div class="cat-card" style="padding: 12px; text-align: left;">
-                <div style="width: 100%; height: 130px; background: #2a2a2a; border-radius: 6px; display: flex; align-items: center; justify-content: justify-content; justify-content: center; margin-bottom: 10px; overflow: hidden;">
-                    <!-- Cuando tengas la imagen real, reemplazas la línea de abajo por: <img src="ruta-de-tu-foto.jpg" style="width: 100%; height: 100%; object-fit: cover;"> -->
-                    <i class="fa-solid fa-key" style="font-size: 2.5rem; color: var(--primary);"></i>
+            <div class="product-carousel" id="carousel">
+                <!-- Producto 1 -->
+                <div class="product-card">
+                    <div class="product-img"><i class="fa-solid fa-key fa-3x" style="color: var(--primary);"></i></div>
+                    <h4>Llavero Custom Logo</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-gray);">Diseños y marcas a pedido</p>
+                    <div class="price">$ 1.500</div>
                 </div>
-                <p style="font-weight: bold; font-size: 0.9rem; color: #fff; margin-bottom: 5px;">Llavero Custom Logo</p>
-                <span style="color: var(--primary); font-weight: bold; font-size: 1rem;">$ 1.500</span>
+                <!-- Producto 2 -->
+                <div class="product-card">
+                    <div class="product-img"><i class="fa-solid fa-cookie-bite fa-3x" style="color: var(--primary);"></i></div>
+                    <h4>Cortante Personalizado</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-gray);">Apto para repostería</p>
+                    <div class="price">$ 2.000</div>
+                </div>
+                <!-- Producto 3 -->
+                <div class="product-card">
+                    <div class="product-img"><i class="fa-solid fa-gamepad fa-3x" style="color: var(--primary);"></i></div>
+                    <h4>Soporte Joystick PS5</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-gray);">Impreso en PLA reforzado</p>
+                    <div class="price">$ 3.800</div>
+                </div>
+                <!-- Producto 4 -->
+                <div class="product-card">
+                    <div class="product-img"><i class="fa-solid fa-headset fa-3x" style="color: var(--primary);"></i></div>
+                    <h4>Soporte Auriculares</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-gray);">Soporte de escritorio</p>
+                    <div class="price">$ 4.200</div>
+                </div>
+                <!-- Producto 5 -->
+                <div class="product-card">
+                    <div class="product-img"><i class="fa-solid fa-desktop fa-3x" style="color: var(--primary);"></i></div>
+                    <h4>Elevador de Monitor</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-gray);">Soporte ergonómico</p>
+                    <div class="price">$ 5.500</div>
+                </div>
+                <!-- Producto 6 -->
+                <div class="product-card">
+                    <div class="product-img"><i class="fa-solid fa-box fa-3x" style="color: var(--primary);"></i></div>
+                    <h4>Caja Organizadora SD</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-gray);">Para tarjetas y memorias</p>
+                    <div class="price">$ 1.800</div>
+                </div>
+                <!-- Producto 7 -->
+                <div class="product-card">
+                    <div class="product-img"><i class="fa-solid fa-fan fa-3x" style="color: var(--primary);"></i></div>
+                    <h4>Tobera Fan 5015</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-gray);">Mejora de flujo de aire</p>
+                    <div class="price">$ 2.200</div>
+                </div>
+                <!-- Producto 8 -->
+                <div class="product-card">
+                    <div class="product-img"><i class="fa-solid fa-mobile-screen fa-3x" style="color: var(--primary);"></i></div>
+                    <h4>Soporte Celular Desk</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-gray);">Ángulo ajustable</p>
+                    <div class="price">$ 2.500</div>
+                </div>
+                <!-- Producto 9 -->
+                <div class="product-card">
+                    <div class="product-img"><i class="fa-solid fa-cable-car fa-3x" style="color: var(--primary);"></i></div>
+                    <h4>Guía de Cables Mod</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-gray);">Organizador para setup</p>
+                    <div class="price">$ 1.200</div>
+                </div>
+                <!-- Producto 10 -->
+                <div class="product-card">
+                    <div class="product-img"><i class="fa-solid fa-lightbulb fa-3x" style="color: var(--primary);"></i></div>
+                    <h4>Lámpara Litofanía</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-gray);">Foto personalizable 3D</p>
+                    <div class="price">$ 8.000</div>
+                </div>
             </div>
 
-            <!-- Producto 2 -->
-            <div class="cat-card" style="padding: 12px; text-align: left;">
-                <div style="width: 100%; height: 130px; background: #2a2a2a; border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; overflow: hidden;">
-                    <i class="fa-solid fa-cookie-bite" style="font-size: 2.5rem; color: var(--primary);"></i>
-                </div>
-                <p style="font-weight: bold; font-size: 0.9rem; color: #fff; margin-bottom: 5px;">Cortante Personalizado</p>
-                <span style="color: var(--primary); font-weight: bold; font-size: 1rem;">$ 2.000</span>
-            </div>
-
-            <!-- Producto 3 -->
-            <div class="cat-card" style="padding: 12px; text-align: left;">
-                <div style="width: 100%; height: 130px; background: #2a2a2a; border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; overflow: hidden;">
-                    <i class="fa-solid fa-layer-group" style="font-size: 2.5rem; color: var(--primary);"></i>
-                </div>
-                <p style="font-weight: bold; font-size: 0.9rem; color: #fff; margin-bottom: 5px;">Soporte Joystick PS5</p>
-                <span style="color: var(--primary); font-weight: bold; font-size: 1rem;">$ 3.800</span>
-            </div>
-
-            <!-- Producto 4 -->
-            <div class="cat-card" style="padding: 12px; text-align: left;">
-                <div style="width: 100%; height: 130px; background: #2a2a2a; border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; overflow: hidden;">
-                    <i class="fa-solid fa-headset" style="font-size: 2.5rem; color: var(--primary);"></i>
-                </div>
-                <p style="font-weight: bold; font-size: 0.9rem; color: #fff; margin-bottom: 5px;">Soporte Auriculares</p>
-                <span style="color: var(--primary); font-weight: bold; font-size: 1rem;">$ 4.200</span>
-            </div>
-
+            <button class="arrow-btn arrow-right" id="nextBtn" onclick="scrollCarousel(1)">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
         </div>
     </section>
 
