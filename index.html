@@ -142,36 +142,39 @@
         }
     </style>
 </head>
-<script>
-        const carousel = document.getElementById('carousel');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-
-        function scrollCarousel(direction) {
-            // Desplaza el ancho completo visible del contenedor (los 5 productos)
-            const scrollAmount = carousel.clientWidth;
-            carousel.scrollBy({
+<!-- Lógica JavaScript del Carrusel Actualizada -->
+    <script>
+        function moveCarousel(direction) {
+            const carouselEl = document.getElementById('carousel');
+            if (!carouselEl) return;
+            const scrollAmount = carouselEl.clientWidth;
+            carouselEl.scrollBy({
                 left: direction * scrollAmount,
                 behavior: 'smooth'
             });
         }
 
-        // Evalúa la posición del scroll para mostrar u ocultar las flechas
-        carousel.addEventListener('scroll', () => {
-            const maxScrollLeft = carousel.scrollWidth - carousel.clientWidth;
-            
-            // Oculta/Muestra flecha izquierda
-            if (carousel.scrollLeft <= 10) {
-                prevBtn.style.display = 'none';
-            } else {
-                prevBtn.style.display = 'flex';
-            }
+        document.addEventListener('DOMContentLoaded', () => {
+            const carouselEl = document.getElementById('carousel');
+            const prevBtnEl = document.getElementById('prevBtn');
+            const nextBtnEl = document.getElementById('nextBtn');
 
-            // Oculta/Muestra flecha derecha al llegar al final
-            if (carousel.scrollLeft >= maxScrollLeft - 10) {
-                nextBtn.style.display = 'none';
-            } else {
-                nextBtn.style.display = 'flex';
+            if (carouselEl) {
+                carouselEl.addEventListener('scroll', () => {
+                    const maxScrollLeft = carouselEl.scrollWidth - carouselEl.clientWidth;
+                    
+                    if (carouselEl.scrollLeft <= 10) {
+                        prevBtnEl.style.display = 'none';
+                    } else {
+                        prevBtnEl.style.display = 'flex';
+                    }
+
+                    if (carouselEl.scrollLeft >= maxScrollLeft - 10) {
+                        nextBtnEl.style.display = 'none';
+                    } else {
+                        nextBtnEl.style.display = 'flex';
+                    }
+                });
             }
         });
     </script>
@@ -220,79 +223,69 @@
         </div>
     </section>
 
-    <!-- Productos Recién Agregados (Carrusel Deslizante) -->
+    <!-- Productos Recién Agregados (Carrusel Deslizante Corrido) -->
     <section class="categories-slider">
         <h2 class="section-title">Productos Recién Agregados</h2>
-        <div class="carousel-wrapper">
-            <button class="arrow-btn arrow-left" id="prevBtn" onclick="scrollCarousel(-1)">
+        <div class="carousel-wrapper" style="position: relative; padding: 0 25px;">
+            <button class="arrow-btn arrow-left" id="prevBtn" onclick="moveCarousel(-1)" style="left: -15px;">
                 <i class="fa-solid fa-chevron-left"></i>
             </button>
             
             <div class="product-carousel" id="carousel">
-                <!-- Producto 1 -->
                 <div class="product-card">
                     <div class="product-img"><i class="fa-solid fa-key fa-3x" style="color: var(--primary);"></i></div>
                     <h4>Llavero Custom Logo</h4>
                     <p style="font-size: 0.8rem; color: var(--text-gray);">Diseños y marcas a pedido</p>
                     <div class="price">$ 1.500</div>
                 </div>
-                <!-- Producto 2 -->
                 <div class="product-card">
                     <div class="product-img"><i class="fa-solid fa-cookie-bite fa-3x" style="color: var(--primary);"></i></div>
                     <h4>Cortante Personalizado</h4>
                     <p style="font-size: 0.8rem; color: var(--text-gray);">Apto para repostería</p>
                     <div class="price">$ 2.000</div>
                 </div>
-                <!-- Producto 3 -->
                 <div class="product-card">
                     <div class="product-img"><i class="fa-solid fa-gamepad fa-3x" style="color: var(--primary);"></i></div>
                     <h4>Soporte Joystick PS5</h4>
                     <p style="font-size: 0.8rem; color: var(--text-gray);">Impreso en PLA reforzado</p>
                     <div class="price">$ 3.800</div>
                 </div>
-                <!-- Producto 4 -->
                 <div class="product-card">
                     <div class="product-img"><i class="fa-solid fa-headset fa-3x" style="color: var(--primary);"></i></div>
                     <h4>Soporte Auriculares</h4>
                     <p style="font-size: 0.8rem; color: var(--text-gray);">Soporte de escritorio</p>
                     <div class="price">$ 4.200</div>
                 </div>
-                <!-- Producto 5 -->
                 <div class="product-card">
                     <div class="product-img"><i class="fa-solid fa-desktop fa-3x" style="color: var(--primary);"></i></div>
                     <h4>Elevador de Monitor</h4>
                     <p style="font-size: 0.8rem; color: var(--text-gray);">Soporte ergonómico</p>
                     <div class="price">$ 5.500</div>
                 </div>
-                <!-- Producto 6 -->
                 <div class="product-card">
                     <div class="product-img"><i class="fa-solid fa-box fa-3x" style="color: var(--primary);"></i></div>
                     <h4>Caja Organizadora SD</h4>
                     <p style="font-size: 0.8rem; color: var(--text-gray);">Para tarjetas y memorias</p>
                     <div class="price">$ 1.800</div>
                 </div>
-                <!-- Producto 7 -->
                 <div class="product-card">
                     <div class="product-img"><i class="fa-solid fa-fan fa-3x" style="color: var(--primary);"></i></div>
                     <h4>Tobera Fan 5015</h4>
                     <p style="font-size: 0.8rem; color: var(--text-gray);">Mejora de flujo de aire</p>
                     <div class="price">$ 2.200</div>
                 </div>
-                <!-- Producto 8 -->
                 <div class="product-card">
                     <div class="product-img"><i class="fa-solid fa-mobile-screen fa-3x" style="color: var(--primary);"></i></div>
                     <h4>Soporte Celular Desk</h4>
                     <p style="font-size: 0.8rem; color: var(--text-gray);">Ángulo ajustable</p>
                     <div class="price">$ 2.500</div>
                 </div>
-                <!-- Producto 9 -->
                 <div class="product-card">
                     <div class="product-img"><i class="fa-solid fa-cable-car fa-3x" style="color: var(--primary);"></i></div>
                     <h4>Guía de Cables Mod</h4>
                     <p style="font-size: 0.8rem; color: var(--text-gray);">Organizador para setup</p>
                     <div class="price">$ 1.200</div>
                 </div>
-                <!-- Producto 10 -->
                 <div class="product-card">
                     <div class="product-img"><i class="fa-solid fa-lightbulb fa-3x" style="color: var(--primary);"></i></div>
                     <h4>Lámpara Litofanía</h4>
@@ -301,7 +294,7 @@
                 </div>
             </div>
 
-            <button class="arrow-btn arrow-right" id="nextBtn" onclick="scrollCarousel(1)">
+            <button class="arrow-btn arrow-right" id="nextBtn" onclick="moveCarousel(1)" style="right: -15px;">
                 <i class="fa-solid fa-chevron-right"></i>
             </button>
         </div>
