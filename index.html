@@ -37,8 +37,13 @@
         nav a:hover { color: var(--primary); }
 
         /* Hero Banner Carrusel Estilos */
-        .hero-container {
+        .hero-wrapper {
+            position: relative;
             margin: 20px 5%;
+            padding: 0 25px; /* Espacio externo para que las flechas no pisen el banner */
+        }
+
+        .hero-container {
             position: relative;
             overflow: hidden;
             border-radius: 8px;
@@ -65,23 +70,23 @@
         .hero-text p { color: var(--text-gray); margin-bottom: 20px; max-width: 500px; }
         .btn-main { background: var(--primary); color: #fff; padding: 12px 25px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-block; }
 
-        /* Flechas fijas del Hero Banner */
+        /* Flechas externas del Hero Banner */
         .hero-arrow {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            background: rgba(0, 0, 0, 0.75);
-            border: 1px solid var(--primary);
+            background: rgba(0, 0, 0, 0.85);
+            border: 2px solid var(--primary);
             color: var(--primary);
-            width: 40px;
-            height: 40px;
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             z-index: 10;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             transition: 0.3s;
         }
 
@@ -90,8 +95,8 @@
             color: #fff;
         }
 
-        .hero-arrow.prev { left: 15px; }
-        .hero-arrow.next { right: 15px; }
+        .hero-arrow.prev { left: -15px; }
+        .hero-arrow.next { right: -15px; }
 
         /* Materiales / Marcas */
         .categories-slider { padding: 20px 5%; }
@@ -306,7 +311,7 @@
     </nav>
 
     <!-- Hero Banner Carrusel de 4 -->
-    <div class="hero-container">
+    <div class="hero-wrapper">
         <button class="hero-arrow prev" onclick="userMoveHero(-1)">
             <i class="fa-solid fa-chevron-left"></i>
         </button>
@@ -314,45 +319,47 @@
             <i class="fa-solid fa-chevron-right"></i>
         </button>
 
-        <div class="hero-slider" id="heroSlider">
-            <!-- Banner 1 -->
-            <div class="hero-slide">
-                <div class="hero-text">
-                    <h1>Impresión 3D Personalizada</h1>
-                    <p>Enviamos tus diseños o ideas para imprimir bajo pedido. Repuestos técnicos, prototipos y piezas mecánicas a medida.</p>
-                    <a href="https://wa.me/" class="btn-main"><i class="fa-brands fa-whatsapp"></i> Pedir Cotización Directa</a>
+        <div class="hero-container">
+            <div class="hero-slider" id="heroSlider">
+                <!-- Banner 1 -->
+                <div class="hero-slide">
+                    <div class="hero-text">
+                        <h1>Impresión 3D Personalizada</h1>
+                        <p>Enviamos tus diseños o ideas para imprimir bajo pedido. Repuestos técnicos, prototipos y piezas mecánicas a medida.</p>
+                        <a href="https://wa.me/" class="btn-main"><i class="fa-brands fa-whatsapp"></i> Pedir Cotización Directa</a>
+                    </div>
+                    <div><i class="fa-solid fa-gears" style="font-size: 8rem; color: #333;"></i></div>
                 </div>
-                <div><i class="fa-solid fa-gears" style="font-size: 8rem; color: #333;"></i></div>
-            </div>
 
-            <!-- Banner 2 -->
-            <div class="hero-slide">
-                <div class="hero-text">
-                    <h1>Modelado en Resina de Alta Definición</h1>
-                    <p>Figuras coleccionables, prototipos finos y piezas con detalle superior nivel profesional.</p>
-                    <a href="https://wa.me/" class="btn-main"><i class="fa-solid fa-robot"></i> Consultar Catálogo</a>
+                <!-- Banner 2 -->
+                <div class="hero-slide">
+                    <div class="hero-text">
+                        <h1>Modelado en Resina de Alta Definición</h1>
+                        <p>Figuras coleccionables, prototipos finos y piezas con detalle superior nivel profesional.</p>
+                        <a href="https://wa.me/" class="btn-main"><i class="fa-solid fa-robot"></i> Consultar Catálogo</a>
+                    </div>
+                    <div><i class="fa-solid fa-microchip" style="font-size: 8rem; color: #333;"></i></div>
                 </div>
-                <div><i class="fa-solid fa-microchip" style="font-size: 8rem; color: #333;"></i></div>
-            </div>
 
-            <!-- Banner 3 -->
-            <div class="hero-slide">
-                <div class="hero-text">
-                    <h1>Envíos a Córdoba y Todo el País</h1>
-                    <p>Embalaje seguro y entregas rápidas para que recibas tus impresiones sin complicaciones.</p>
-                    <a href="https://wa.me/" class="btn-main"><i class="fa-solid fa-truck-fast"></i> Consultar Costo de Envío</a>
+                <!-- Banner 3 -->
+                <div class="hero-slide">
+                    <div class="hero-text">
+                        <h1>Envíos a Córdoba y Todo el País</h1>
+                        <p>Embalaje seguro y entregas rápidas para que recibas tus impresiones sin complicaciones.</p>
+                        <a href="https://wa.me/" class="btn-main"><i class="fa-solid fa-truck-fast"></i> Consultar Costo de Envío</a>
+                    </div>
+                    <div><i class="fa-solid fa-box-open" style="font-size: 8rem; color: #333;"></i></div>
                 </div>
-                <div><i class="fa-solid fa-box-open" style="font-size: 8rem; color: #333;"></i></div>
-            </div>
 
-            <!-- Banner 4 -->
-            <div class="hero-slide">
-                <div class="hero-text">
-                    <h1>Venta de Filamentos y Repuestos</h1>
-                    <p>Insumos seleccionados para makers y talleres. PLA, PETG, ABS y componentes de precisión.</p>
-                    <a href="https://wa.me/" class="btn-main"><i class="fa-solid fa-layer-group"></i> Ver Insumos</a>
+                <!-- Banner 4 -->
+                <div class="hero-slide">
+                    <div class="hero-text">
+                        <h1>Venta de Filamentos y Repuestos</h1>
+                        <p>Insumos seleccionados para makers y talleres. PLA, PETG, ABS y componentes de precisión.</p>
+                        <a href="https://wa.me/" class="btn-main"><i class="fa-solid fa-layer-group"></i> Ver Insumos</a>
+                    </div>
+                    <div><i class="fa-solid fa-cubes" style="font-size: 8rem; color: #333;"></i></div>
                 </div>
-                <div><i class="fa-solid fa-cubes" style="font-size: 8rem; color: #333;"></i></div>
             </div>
         </div>
     </div>
