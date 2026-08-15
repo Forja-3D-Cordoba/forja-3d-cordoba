@@ -142,10 +142,10 @@
         }
     </style>
 </head>
-<!-- Lógica JavaScript del Carrusel Actualizada -->
+<!-- Script de control para los 3 carruseles -->
     <script>
-        function moveCarousel(direction) {
-            const carouselEl = document.getElementById('carousel');
+        function moveCarousel(direction, carouselId) {
+            const carouselEl = document.getElementById(carouselId);
             if (!carouselEl) return;
             const scrollAmount = carouselEl.clientWidth;
             carouselEl.scrollBy({
@@ -154,12 +154,12 @@
             });
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const carouselEl = document.getElementById('carousel');
-            const prevBtnEl = document.getElementById('prevBtn');
-            const nextBtnEl = document.getElementById('nextBtn');
+        function setupCarouselSync(carouselId, prevBtnId, nextBtnId) {
+            const carouselEl = document.getElementById(carouselId);
+            const prevBtnEl = document.getElementById(prevBtnId);
+            const nextBtnEl = document.getElementById(nextBtnId);
 
-            if (carouselEl) {
+            if (carouselEl && prevBtnEl && nextBtnEl) {
                 carouselEl.addEventListener('scroll', () => {
                     const maxScrollLeft = carouselEl.scrollWidth - carouselEl.clientWidth;
                     
@@ -176,6 +176,12 @@
                     }
                 });
             }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setupCarouselSync('carousel-recien', 'prevBtn-recien', 'nextBtn-recien');
+            setupCarouselSync('carousel-destacados', 'prevBtn-destacados', 'nextBtn-destacados');
+            setupCarouselSync('carousel-variedad', 'prevBtn-variedad', 'nextBtn-variedad');
         });
     </script>
 <body>
@@ -223,78 +229,90 @@
         </div>
     </section>
 
-    <!-- Productos Recién Agregados (Carrusel Deslizante Corrido) -->
+    <!-- 1. Productos Recién Agregados -->
     <section class="categories-slider">
         <h2 class="section-title">Productos Recién Agregados</h2>
         <div class="carousel-wrapper" style="position: relative; padding: 0 25px;">
-            <button class="arrow-btn arrow-left" id="prevBtn" onclick="moveCarousel(-1)" style="left: -15px;">
+            <button class="arrow-btn arrow-left" id="prevBtn-recien" onclick="moveCarousel(-1, 'carousel-recien')" style="left: -15px;">
                 <i class="fa-solid fa-chevron-left"></i>
             </button>
             
-            <div class="product-carousel" id="carousel">
-                <div class="product-card">
-                    <div class="product-img"><i class="fa-solid fa-key fa-3x" style="color: var(--primary);"></i></div>
-                    <h4>Llavero Custom Logo</h4>
-                    <p style="font-size: 0.8rem; color: var(--text-gray);">Diseños y marcas a pedido</p>
-                    <div class="price">$ 1.500</div>
-                </div>
-                <div class="product-card">
-                    <div class="product-img"><i class="fa-solid fa-cookie-bite fa-3x" style="color: var(--primary);"></i></div>
-                    <h4>Cortante Personalizado</h4>
-                    <p style="font-size: 0.8rem; color: var(--text-gray);">Apto para repostería</p>
-                    <div class="price">$ 2.000</div>
-                </div>
-                <div class="product-card">
-                    <div class="product-img"><i class="fa-solid fa-gamepad fa-3x" style="color: var(--primary);"></i></div>
-                    <h4>Soporte Joystick PS5</h4>
-                    <p style="font-size: 0.8rem; color: var(--text-gray);">Impreso en PLA reforzado</p>
-                    <div class="price">$ 3.800</div>
-                </div>
-                <div class="product-card">
-                    <div class="product-img"><i class="fa-solid fa-headset fa-3x" style="color: var(--primary);"></i></div>
-                    <h4>Soporte Auriculares</h4>
-                    <p style="font-size: 0.8rem; color: var(--text-gray);">Soporte de escritorio</p>
-                    <div class="price">$ 4.200</div>
-                </div>
-                <div class="product-card">
-                    <div class="product-img"><i class="fa-solid fa-desktop fa-3x" style="color: var(--primary);"></i></div>
-                    <h4>Elevador de Monitor</h4>
-                    <p style="font-size: 0.8rem; color: var(--text-gray);">Soporte ergonómico</p>
-                    <div class="price">$ 5.500</div>
-                </div>
-                <div class="product-card">
-                    <div class="product-img"><i class="fa-solid fa-box fa-3x" style="color: var(--primary);"></i></div>
-                    <h4>Caja Organizadora SD</h4>
-                    <p style="font-size: 0.8rem; color: var(--text-gray);">Para tarjetas y memorias</p>
-                    <div class="price">$ 1.800</div>
-                </div>
-                <div class="product-card">
-                    <div class="product-img"><i class="fa-solid fa-fan fa-3x" style="color: var(--primary);"></i></div>
-                    <h4>Tobera Fan 5015</h4>
-                    <p style="font-size: 0.8rem; color: var(--text-gray);">Mejora de flujo de aire</p>
-                    <div class="price">$ 2.200</div>
-                </div>
-                <div class="product-card">
-                    <div class="product-img"><i class="fa-solid fa-mobile-screen fa-3x" style="color: var(--primary);"></i></div>
-                    <h4>Soporte Celular Desk</h4>
-                    <p style="font-size: 0.8rem; color: var(--text-gray);">Ángulo ajustable</p>
-                    <div class="price">$ 2.500</div>
-                </div>
-                <div class="product-card">
-                    <div class="product-img"><i class="fa-solid fa-cable-car fa-3x" style="color: var(--primary);"></i></div>
-                    <h4>Guía de Cables Mod</h4>
-                    <p style="font-size: 0.8rem; color: var(--text-gray);">Organizador para setup</p>
-                    <div class="price">$ 1.200</div>
-                </div>
-                <div class="product-card">
-                    <div class="product-img"><i class="fa-solid fa-lightbulb fa-3x" style="color: var(--primary);"></i></div>
-                    <h4>Lámpara Litofanía</h4>
-                    <p style="font-size: 0.8rem; color: var(--text-gray);">Foto personalizable 3D</p>
-                    <div class="price">$ 8.000</div>
-                </div>
+            <div class="product-carousel" id="carousel-recien">
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-key fa-3x" style="color: var(--primary);"></i></div><h4>Llavero Custom Logo</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Diseños y marcas a pedido</p><div class="price">$ 1.500</div></div>
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-cookie-bite fa-3x" style="color: var(--primary);"></i></div><h4>Cortante Personalizado</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Apto para repostería</p><div class="price">$ 2.000</div></div>
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-gamepad fa-3x" style="color: var(--primary);"></i></div><h4>Soporte Joystick PS5</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Impreso en PLA reforzado</p><div class="price">$ 3.800</div></div>
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-headset fa-3x" style="color: var(--primary);"></i></div><h4>Soporte Auriculares</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Soporte de escritorio</p><div class="price">$ 4.200</div></div>
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-desktop fa-3x" style="color: var(--primary);"></i></div><h4>Elevador de Monitor</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Soporte ergonómico</p><div class="price">$ 5.500</div></div>
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-box fa-3x" style="color: var(--primary);"></i></div><h4>Caja Organizadora SD</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Para tarjetas y memorias</p><div class="price">$ 1.800</div></div>
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-fan fa-3x" style="color: var(--primary);"></i></div><h4>Tobera Fan 5015</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Mejora de flujo de aire</p><div class="price">$ 2.200</div></div>
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-mobile-screen fa-3x" style="color: var(--primary);"></i></div><h4>Soporte Celular Desk</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Ángulo ajustable</p><div class="price">$ 2.500</div></div>
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-cable-car fa-3x" style="color: var(--primary);"></i></div><h4>Guía de Cables Mod</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Organizador para setup</p><div class="price">$ 1.200</div></div>
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-lightbulb fa-3x" style="color: var(--primary);"></i></div><h4>Lámpara Litofanía</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Foto personalizable 3D</p><div class="price">$ 8.000</div></div>
             </div>
 
-            <button class="arrow-btn arrow-right" id="nextBtn" onclick="moveCarousel(1)" style="right: -15px;">
+            <button class="arrow-btn arrow-right" id="nextBtn-recien" onclick="moveCarousel(1, 'carousel-recien')" style="right: -15px;">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+    </section>
+
+    <!-- 2. Productos Destacados -->
+    <section class="products-section">
+        <h2 class="section-title">Productos Destacados</h2>
+        <div class="carousel-wrapper" style="position: relative; padding: 0 25px;">
+            <button class="arrow-btn arrow-left" id="prevBtn-destacados" onclick="moveCarousel(-1, 'carousel-destacados')" style="left: -15px;">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
+            <div class="product-carousel" id="carousel-destacados">
+                <!-- Banner Cotización -->
+                <div class="side-banner" style="min-width: 240px;">
+                    <h3>¿Tenés un diseño en paso o STL?</h3>
+                    <p style="margin: 15px 0; color: var(--text-gray); font-size: 0.9rem;">Cargá tu archivo y cotizamos la impresión en minutos.</p>
+                    <button class="btn-main" style="padding: 8px 15px; font-size: 0.85rem;">Subir Archivo</button>
+                </div>
+
+                <!-- 10 Productos Populares -->
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-gear fa-3x"></i></div><h4>Engranaje Técnico PETG</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Alta resistencia mecánica</p><div class="price">$ 4.500</div><button class="btn-buy">Ver Detalle</button></div>
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-microchip fa-3x"></i></div><h4>Gabinete Electrónico</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Diseño custom para PCB</p><div class="price">$ 6.200</div><button class="btn-buy">Ver Detalle</button></div>
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-robot fa-3x"></i></div><h4>Figura Alta Resina</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Detalle nivel coleccionista</p><div class="price">$ 12.000</div><button class="btn-buy">Ver Detalle</button></div>
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-dragon fa-3x"></i></div><h4>Dragón Articulado</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Impresión multicolor</p><div class="price">$ 7.500</div><button class="btn-buy">Ver Detalle</button></div>
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-wrench fa-3x"></i></div><h4>Polea de Precisión</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Para motores Nema</p><div class="price">$ 3.100</div><button class="btn-buy">Ver Detalle</button></div>
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-chess-knight fa-3x"></i></div><h4>Juego Ajedrez 3D</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Diseño temático</p><div class="price">$ 14.000</div><button class="btn-buy">Ver Detalle</button></div>
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-plug fa-3x"></i></div><h4>Adaptador Riel DIN</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Para tableros</p><div class="price">$ 2.400</div><button class="btn-buy">Ver Detalle</button></div>
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-masks-theater fa-3x"></i></div><h4>Máscara Cosplay</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Escala 1:1 real</p><div class="price">$ 18.500</div><button class="btn-buy">Ver Detalle</button></div>
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-shield-halved fa-3x"></i></div><h4>Protector de Cable</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Guía articulada</p><div class="price">$ 2.700</div><button class="btn-buy">Ver Detalle</button></div>
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-gem fa-3x"></i></div><h4>Cristal Lámpara 3D</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Con base iluminada</p><div class="price">$ 11.000</div><button class="btn-buy">Ver Detalle</button></div>
+            </div>
+
+            <button class="arrow-btn arrow-right" id="nextBtn-destacados" onclick="moveCarousel(1, 'carousel-destacados')" style="right: -15px;">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+    </section>
+
+    <!-- 3. Variedad del Día -->
+    <section class="products-section">
+        <h2 class="section-title">Variedad del Día</h2>
+        <div class="carousel-wrapper" style="position: relative; padding: 0 25px;">
+            <button class="arrow-btn arrow-left" id="prevBtn-variedad" onclick="moveCarousel(-1, 'carousel-variedad')" style="left: -15px;">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
+            <div class="product-carousel" id="carousel-variedad">
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-car-battery fa-3x"></i></div><h4>Tapa de Batería Mod</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Repuesto a medida</p><div class="price">$ 3.500</div><button class="btn-buy">Ver Detalle</button></div>
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-skull fa-3x"></i></div><h4>Busto Gamer Custom</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Pintado a mano</p><div class="price">$ 15.000</div><button class="btn-buy">Ver Detalle</button></div>
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-industry fa-3x"></i></div><h4>Acople Flexible</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Eje de transmisión</p><div class="price">$ 3.900</div><button class="btn-buy">Ver Detalle</button></div>
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-wand-magic-sparkles fa-3x"></i></div><h4>Varita Mágica</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Textura madera</p><div class="price">$ 6.800</div><button class="btn-buy">Ver Detalle</button></div>
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-grip fa-3x"></i></div><h4>Empuñadura Ergonomica</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Diseño industrial</p><div class="price">$ 4.800</div><button class="btn-buy">Ver Detalle</button></div>
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-monument fa-3x"></i></div><h4>Diorama Setup LED</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Base con luz</p><div class="price">$ 22.000</div><button class="btn-buy">Ver Detalle</button></div>
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-layer-group fa-3x"></i></div><h4>Espaciadores PETG</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Pack x10 piezas</p><div class="price">$ 1.900</div><button class="btn-buy">Ver Detalle</button></div>
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-hat-wizard fa-3x"></i></div><h4>Minis D&D (Pack x4)</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Resina definición</p><div class="price">$ 9.200</div><button class="btn-buy">Ver Detalle</button></div>
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-screwdriver-wrench fa-3x"></i></div><h4>Soporte de Sensor</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Impreso en ABS</p><div class="price">$ 2.800</div><button class="btn-buy">Ver Detalle</button></div>
+                <div class="product-card"><div class="product-img"><i class="fa-solid fa-crown fa-3x"></i></div><h4>Réplica Casco Mod</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Edición especial</p><div class="price">$ 25.000</div><button class="btn-buy">Ver Detalle</button></div>
+            </div>
+
+            <button class="arrow-btn arrow-right" id="nextBtn-variedad" onclick="moveCarousel(1, 'carousel-variedad')" style="right: -15px;">
                 <i class="fa-solid fa-chevron-right"></i>
             </button>
         </div>
