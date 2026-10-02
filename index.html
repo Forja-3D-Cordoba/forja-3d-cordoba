@@ -40,19 +40,19 @@
         }
         .user-dropdown.active { display: flex; }
         .user-dropdown p.dropdown-sub { font-size: 0.88rem; color: var(--text-light); line-height: 1.4; margin: 0; }
-        .btn-dropdown-login {
+        .btn-dropdown-action {
             background: var(--primary); color: #fff; border: none; padding: 10px 14px; border-radius: 6px;
             font-weight: bold; cursor: pointer; text-align: center; font-size: 0.9rem; transition: transform 0.2s, background 0.2s;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
+            display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
         }
-        .btn-dropdown-login:hover { transform: translateY(-2px); background: var(--primary-dark); }
+        .btn-dropdown-action:hover { transform: translateY(-2px); background: var(--primary-dark); }
+        .btn-dropdown-logout { background: #333; color: #ff5252; }
+        .btn-dropdown-logout:hover { background: #444; color: #ff7373; }
 
         /* Control de Visibilidad SPA */
         .view-hidden { display: none !important; }
 
-        /* ============================================== */
-        /* MODO /login: PANTALLA TOTALMENTE LIMPIA Y CENTRADA */
-        /* ============================================== */
+        /* MODO /login: PANTALLA LIMPIA Y CENTRADA */
         body.mode-login .top-bar,
         body.mode-login header,
         body.mode-login nav,
@@ -70,67 +70,38 @@
             padding: 20px;
         }
 
-        .login-brand-header {
-            margin-bottom: 25px;
-            text-align: center;
-            cursor: pointer;
-        }
-
-        .login-brand-header .logo-large {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            justify-content: center;
-        }
+        .login-brand-header { margin-bottom: 25px; text-align: center; cursor: pointer; }
+        .login-brand-header .logo-large { font-size: 2.5rem; font-weight: bold; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; gap: 12px; justify-content: center; }
 
         .login-card-frame {
-            background: #181818;
-            border: 1px solid var(--primary);
-            border-radius: 14px;
-            padding: 40px 32px;
-            max-width: 460px;
-            width: 100%;
-            text-align: center;
+            background: #181818; border: 1px solid var(--primary); border-radius: 14px;
+            padding: 40px 32px; max-width: 460px; width: 100%; text-align: center;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
         }
-
-        .login-card-frame h2 { color: #fff; margin-bottom: 15px; font-size: 1.6rem; }
+        .login-card-frame h2 { color: #fff; margin-bottom: 12px; font-size: 1.5rem; }
 
         .login-security-box {
-            font-size: 0.88rem;
-            color: var(--text-gray);
-            line-height: 1.5;
-            margin: 20px 0 25px 0;
-            background: #101010;
-            padding: 16px;
-            border-radius: 8px;
-            border-left: 3px solid var(--primary);
-            text-align: left;
+            font-size: 0.88rem; color: var(--text-gray); line-height: 1.5; margin: 15px 0 22px 0;
+            background: #101010; padding: 14px; border-radius: 8px; border-left: 3px solid var(--primary); text-align: left;
         }
 
         .btn-google-large {
-            background: #ffffff;
-            color: #000000;
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 0.98rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
+            background: #ffffff; color: #000000; width: 100%; padding: 14px; border: none; border-radius: 6px;
+            font-weight: bold; font-size: 0.98rem; display: flex; align-items: center; justify-content: center;
+            gap: 10px; cursor: pointer; transition: background 0.2s, transform 0.1s;
         }
-
         .btn-google-large:hover { background: #f0f0f0; transform: translateY(-2px); }
+
+        /* Formulario Perfil */
+        .profile-form { display: flex; flex-direction: column; gap: 15px; text-align: left; margin-top: 15px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 0.85rem; color: var(--text-gray); font-weight: 500; }
+        .form-group input {
+            background: #242424; border: 1px solid #333; padding: 12px 14px; border-radius: 6px;
+            color: #fff; outline: none; font-size: 0.95rem; transition: border-color 0.2s;
+        }
+        .form-group input:focus { border-color: var(--primary); }
+        .form-group input[disabled] { background: #121212; color: #777; cursor: not-allowed; border-color: #222; }
 
         /* Estilos Generales Tienda */
         nav { background: #222; padding: 10px 5%; display: flex; gap: 20px; font-size: 0.9rem; overflow-x: auto; }
@@ -187,12 +158,11 @@
     </style>
 </head>
 <script>
-    /* Lógica de Carruseles */
+    /* Lógica Carruseles */
     function moveCarousel(direction, carouselId) {
         const carouselEl = document.getElementById(carouselId);
         if (!carouselEl) return;
-        const scrollAmount = carouselEl.clientWidth;
-        carouselEl.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+        carouselEl.scrollBy({ left: direction * carouselEl.clientWidth, behavior: 'smooth' });
     }
 
     function setupCarouselSync(carouselId, prevBtnId, nextBtnId) {
@@ -233,7 +203,47 @@
     function startHeroTimer() { heroTimer = setInterval(nextHeroSlide, 5000); }
     function resetHeroTimer() { clearInterval(heroTimer); startHeroTimer(); }
 
-    /* Menú Desplegable Usuario */
+    /* Lógica de Estado de Usuario y Login */
+    function getUserData() {
+        const saved = localStorage.getItem('forja3d_user');
+        return saved ? JSON.parse(saved) : null;
+    }
+
+    function renderUserStatus() {
+        const user = getUserData();
+        const dropdown = document.getElementById('userDropdown');
+        const userIcon = document.getElementById('userIcon');
+
+        if (!dropdown || !userIcon) return;
+
+        if (user) {
+            userIcon.className = "fa-solid fa-circle-user";
+            userIcon.style.color = "var(--primary)";
+            dropdown.innerHTML = `
+                <div style="border-bottom: 1px solid #333; padding-bottom: 10px;">
+                    <strong style="color:#fff; font-size:1rem;">${user.nombre} ${user.apellido}</strong>
+                    <p style="font-size:0.8rem; color:var(--text-gray); margin-top:2px;">${user.email}</p>
+                    ${user.telefono ? `<p style="font-size:0.78rem; color:var(--primary); margin-top:4px;"><i class="fa-solid fa-phone"></i> ${user.telefono}</p>` : ''}
+                </div>
+                <p class="dropdown-sub" style="font-size: 0.8rem; color: var(--accent-green);">
+                    <i class="fa-solid fa-star"></i> Puntos Forja: <strong>0 pts</strong>
+                </p>
+                <button class="btn-dropdown-action btn-dropdown-logout" onclick="logoutUser()">
+                    <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
+                </button>
+            `;
+        } else {
+            userIcon.className = "fa-regular fa-user";
+            userIcon.style.color = "inherit";
+            dropdown.innerHTML = `
+                <p class="dropdown-sub">Iniciá sesión para agilizar tus compras, ver tus pedidos y acumular puntos.</p>
+                <button class="btn-dropdown-action" onclick="navigateTo('/login')">
+                    <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
+                </button>
+            `;
+        }
+    }
+
     function toggleUserDropdown() {
         const dropdown = document.getElementById('userDropdown');
         if (dropdown) dropdown.classList.toggle('active');
@@ -246,6 +256,44 @@
             dropdown.classList.remove('active');
         }
     });
+
+    /* Flujo de Login en 2 Pasos */
+    function simulateGoogleAuth() {
+        // Paso 1: Ocultar el cuadro de Google e ingresar al formulario de perfil
+        document.getElementById('step-google').classList.add('view-hidden');
+        document.getElementById('step-profile').classList.remove('view-hidden');
+
+        // Autocompletar simulado desde Google
+        document.getElementById('input-email').value = "usuario.demo@gmail.com";
+        document.getElementById('input-nombre').value = "Santiago";
+        document.getElementById('input-apellido').value = "";
+    }
+
+    function saveUserProfile(e) {
+        e.preventDefault();
+        const nombre = document.getElementById('input-nombre').value.trim();
+        const apellido = document.getElementById('input-apellido').value.trim();
+        const telefono = document.getElementById('input-telefono').value.trim();
+        const email = document.getElementById('input-email').value;
+
+        if (!nombre || !apellido) {
+            alert('Por favor completá tu Nombre y Apellido.');
+            return;
+        }
+
+        const userData = { nombre, apellido, telefono, email };
+        localStorage.setItem('forja3d_user', JSON.stringify(userData));
+
+        renderUserStatus();
+        navigateTo('/');
+    }
+
+    function logoutUser() {
+        localStorage.removeItem('forja3d_user');
+        renderUserStatus();
+        const dropdown = document.getElementById('userDropdown');
+        if (dropdown) dropdown.classList.remove('active');
+    }
 
     /* Navegación SPA */
     function navigateTo(path) {
@@ -263,6 +311,16 @@
             document.body.classList.add('mode-login');
             if (viewHome) viewHome.classList.add('view-hidden');
             if (viewLogin) viewLogin.classList.remove('view-hidden');
+            
+            // Si ya está logueado y entra a /login, redirigir a Home
+            if (getUserData()) {
+                navigateTo('/');
+                return;
+            }
+
+            // Resetear la pantalla de login al Paso 1
+            document.getElementById('step-google').classList.remove('view-hidden');
+            document.getElementById('step-profile').classList.add('view-hidden');
             window.scrollTo(0, 0);
         } else {
             document.body.classList.remove('mode-login');
@@ -280,6 +338,7 @@
         setupCarouselSync('carousel-destacados', 'prevBtn-destacados', 'nextBtn-destacados');
         setupCarouselSync('carousel-variedad', 'prevBtn-variedad', 'nextBtn-variedad');
         startHeroTimer();
+        renderUserStatus();
         handleRoute(window.location.pathname);
     });
 </script>
@@ -308,13 +367,7 @@
         <div class="user-actions">
             <div class="user-menu-wrapper">
                 <i class="fa-regular fa-user" id="userIcon" title="Cuenta" onclick="toggleUserDropdown()" style="cursor: pointer;"></i>
-                
-                <div class="user-dropdown" id="userDropdown">
-                    <p class="dropdown-sub">Iniciá sesión para agilizar tus compras y ver tus pedidos.</p>
-                    <button class="btn-dropdown-login" onclick="navigateTo('/login')">
-                        <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
-                    </button>
-                </div>
+                <div class="user-dropdown" id="userDropdown"></div>
             </div>
 
             <i class="fa-regular fa-heart" title="Favoritos"></i>
@@ -435,34 +488,68 @@
         </section>
     </main>
 
-    <!-- VISTA DEDICADA /login (PANTALLA LIMPIA Y CENTRADA) -->
+    <!-- VISTA DEDICADA /login -->
     <main id="view-login" class="view-hidden">
         <div class="login-wrapper">
             
-            <!-- LOGO FORJA 3D CENTRADO ARRIBA DEL CUADRO -->
             <div class="login-brand-header" onclick="navigateTo('/')">
                 <div class="logo-large">
                     <i class="fa-solid fa-cube"></i> FORJA 3D
                 </div>
             </div>
 
-            <!-- CUADRO DE INICIO DE SESIÓN -->
-            <div class="login-card-frame">
+            <!-- PASO 1: AUTENTICACIÓN CON GOOGLE -->
+            <div class="login-card-frame" id="step-google">
                 <i class="fa-solid fa-shield-halved" style="font-size: 2.8rem; color: var(--primary); margin-bottom: 12px;"></i>
                 <h2>Iniciar Sesión en Forja 3D</h2>
                 
                 <div class="login-security-box">
                     <i class="fa-solid fa-lock" style="color: var(--primary); margin-right: 6px;"></i>
-                    Utilizamos únicamente el método oficial de Google para garantizar la seguridad total de tu cuenta, contraseñas y datos sensibles. De esta forma, tus credenciales quedan bajo la máxima protección directa de Google y no se almacenan en nuestro sitio.
+                    Utilizamos únicamente el método oficial de Google para garantizar la seguridad total de tu cuenta y datos.
                 </div>
 
-                <button class="btn-google-large" onclick="alert('Conectando con Google...')">
+                <button class="btn-google-large" onclick="simulateGoogleAuth()">
                     <i class="fa-brands fa-google" style="color: #ea4335; font-size: 1.2rem;"></i> Continuar con Google
                 </button>
                 
                 <a href="/" onclick="event.preventDefault(); navigateTo('/');" style="display: inline-block; margin-top: 22px; color: var(--text-gray); font-size: 0.85rem; text-decoration: none;">
                     <i class="fa-solid fa-arrow-left"></i> Volver a la tienda
                 </a>
+            </div>
+
+            <!-- PASO 2: COMPLETAR DATOS DEL PERFIL -->
+            <div class="login-card-frame view-hidden" id="step-profile">
+                <i class="fa-solid fa-id-card" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 10px;"></i>
+                <h2>Completá tu Perfil</h2>
+                <p style="font-size: 0.85rem; color: var(--text-gray); margin-bottom: 15px;">
+                    Tus datos nos ayudan a identificar tus pedidos y sumar Puntos Forja.
+                </p>
+
+                <form class="profile-form" onsubmit="saveUserProfile(event)">
+                    <div class="form-group">
+                        <label>Correo Electrónico (Google)</label>
+                        <input type="email" id="input-email" disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nombre *</label>
+                        <input type="text" id="input-nombre" placeholder="Ej: Santiago" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Apellido *</label>
+                        <input type="text" id="input-apellido" placeholder="Ej: Mora" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Teléfono / WhatsApp (Opcional - Puntos Forja)</label>
+                        <input type="tel" id="input-telefono" placeholder="Ej: 3511234567">
+                    </div>
+
+                    <button type="submit" class="btn-dropdown-action" style="margin-top: 10px; padding: 12px;">
+                        <i class="fa-solid fa-check"></i> Guardar y Continuar
+                    </button>
+                </form>
             </div>
 
         </div>
