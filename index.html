@@ -29,7 +29,126 @@
         .search-box { flex: 1; max-width: 600px; display: flex; }
         .search-box input { width: 100%; padding: 10px 15px; border: none; border-radius: 4px 0 0 4px; outline: none; background: #2a2a2a; color: #fff; }
         .search-box button { background: var(--primary); border: none; padding: 10px 20px; color: #fff; border-radius: 0 4px 4px 0; cursor: pointer; }
-        .user-actions { display: flex; gap: 20px; font-size: 1.2rem; }
+        .user-actions { display: flex; gap: 20px; font-size: 1.2rem; align-items: center; }
+
+        /* Menú Desplegable (Dropdown) del Usuario */
+        .user-menu-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            right: 0;
+            top: 35px;
+            background: #1e1e1e;
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            width: 250px;
+            padding: 18px;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+        }
+
+        .user-dropdown.active {
+            display: flex;
+        }
+
+        .user-dropdown p.dropdown-sub {
+            font-size: 0.88rem;
+            color: var(--text-light);
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        .btn-dropdown-login {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            font-size: 0.9rem;
+            transition: transform 0.2s, background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-dropdown-login:hover {
+            transform: translateY(-2px);
+            background: var(--primary-dark);
+        }
+
+        /* Estilos de Vistas SPA y Pantalla /login */
+        .view-hidden {
+            display: none !important;
+        }
+
+        .login-container {
+            min-height: 75vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-card-frame {
+            background: #181818;
+            border: 1px solid var(--primary);
+            border-radius: 14px;
+            padding: 40px 30px;
+            max-width: 460px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .login-card-frame h2 {
+            color: #fff;
+            margin-bottom: 15px;
+            font-size: 1.6rem;
+        }
+
+        .login-security-box {
+            font-size: 0.88rem;
+            color: var(--text-gray);
+            line-height: 1.5;
+            margin: 20px 0 25px 0;
+            background: #101010;
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary);
+            text-align: left;
+        }
+
+        .btn-google-large {
+            background: #ffffff;
+            color: #000000;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.98rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn-google-large:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+        }
 
         /* Navbar Categorías */
         nav { background: #222; padding: 10px 5%; display: flex; gap: 20px; font-size: 0.9rem; overflow-x: auto; }
@@ -268,6 +387,48 @@
         startHeroTimer();
     }
 
+    /* Lógica de Autenticación y Navegación SPA */
+    function toggleUserDropdown() {
+        const dropdown = document.getElementById('userDropdown');
+        if (dropdown) {
+            dropdown.classList.toggle('active');
+        }
+    }
+
+    // Cierra el desplegable si hacen clic fuera
+    document.addEventListener('click', (e) => {
+        const wrapper = document.querySelector('.user-menu-wrapper');
+        const dropdown = document.getElementById('userDropdown');
+        if (wrapper && dropdown && !wrapper.contains(e.target)) {
+            dropdown.classList.remove('active');
+        }
+    });
+
+    function navigateTo(path) {
+        const dropdown = document.getElementById('userDropdown');
+        if (dropdown) dropdown.classList.remove('active');
+        history.pushState({}, '', path);
+        handleRoute(path);
+    }
+
+    function handleRoute(path) {
+        const viewHome = document.getElementById('view-home');
+        const viewLogin = document.getElementById('view-login');
+
+        if (path === '/login') {
+            if (viewHome) viewHome.classList.add('view-hidden');
+            if (viewLogin) viewLogin.classList.remove('view-hidden');
+            window.scrollTo(0, 0);
+        } else {
+            if (viewLogin) viewLogin.classList.add('view-hidden');
+            if (viewHome) viewHome.classList.remove('view-hidden');
+        }
+    }
+
+    window.addEventListener('popstate', () => {
+        handleRoute(window.location.pathname);
+    });
+
     document.addEventListener('DOMContentLoaded', () => {
         // Inicializar sincronización de los carruseles de productos
         setupCarouselSync('carousel-recien', 'prevBtn-recien', 'nextBtn-recien');
@@ -276,6 +437,9 @@
 
         // Inicializar el timer del Hero Banner
         startHeroTimer();
+
+        // Inicializar el estado de la ruta al cargar la página
+        handleRoute(window.location.pathname);
     });
 </script>
 <body>
@@ -299,152 +463,193 @@
             <button><i class="fa-solid fa-magnifying-glass"></i></button>
         </div>
         <div class="user-actions">
-            <i class="fa-regular fa-user" title="Cuenta"></i>
+            <!-- Ícono de Usuario con Menú Desplegable -->
+            <div class="user-menu-wrapper">
+                <i class="fa-regular fa-user" id="userIcon" title="Cuenta" onclick="toggleUserDropdown()" style="cursor: pointer;"></i>
+                
+                <!-- Desplegable previa al login -->
+                <div class="user-dropdown" id="userDropdown">
+                    <p class="dropdown-sub">Iniciá sesión para agilizar tus compras y ver tus pedidos.</p>
+                    <button class="btn-dropdown-login" onclick="navigateTo('/login')">
+                        <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
+                    </button>
+                </div>
+            </div>
+
             <i class="fa-regular fa-heart" title="Favoritos"></i>
             <i class="fa-solid fa-cart-shopping" title="Carrito"></i>
         </div>
     </header>
 
-    <!-- Navegación por Categorías -->
-    <nav>
-        <a href="#"><i class="fa-solid fa-list"></i> CATEGORÍAS</a>
-        <a href="https://wa.me/"><i class="fa-solid fa-wand-magic-sparkles"></i> Pedido Personalizado (Llaveros, Logos, Regalos)</a>
-    </nav>
+    <!-- VISTA PRINCIPAL (HOME) -->
+    <main id="view-home">
 
-    <!-- Hero Banner Carrusel de 4 -->
-    <div class="hero-wrapper">
-        <button class="hero-arrow prev" onclick="userMoveHero(-1)">
-            <i class="fa-solid fa-chevron-left"></i>
-        </button>
-        <button class="hero-arrow next" onclick="userMoveHero(1)">
-            <i class="fa-solid fa-chevron-right"></i>
-        </button>
+        <!-- Navegación por Categorías -->
+        <nav>
+            <a href="#"><i class="fa-solid fa-list"></i> CATEGORÍAS</a>
+            <a href="https://wa.me/"><i class="fa-solid fa-wand-magic-sparkles"></i> Pedido Personalizado (Llaveros, Logos, Regalos)</a>
+        </nav>
 
-        <div class="hero-container">
-            <div class="hero-slider" id="heroSlider">
-                <!-- Banner 1 -->
-                <div class="hero-slide">
-                    <div class="hero-text">
-                        <h1>Impresión 3D Personalizada</h1>
-                        <p>Enviamos tus diseños o ideas para imprimir bajo pedido. Repuestos técnicos, prototipos y piezas mecánicas a medida.</p>
-                        <a href="https://wa.me/" class="btn-main"><i class="fa-brands fa-whatsapp"></i> Pedir Cotización Directa</a>
-                    </div>
-                    <div><i class="fa-solid fa-gears" style="font-size: 8rem; color: #333;"></i></div>
-                </div>
-
-                <!-- Banner 2 -->
-                <div class="hero-slide">
-                    <div class="hero-text">
-                        <h1>Modelado en Resina de Alta Definición</h1>
-                        <p>Figuras coleccionables, prototipos finos y piezas con detalle superior nivel profesional.</p>
-                        <a href="https://wa.me/" class="btn-main"><i class="fa-solid fa-robot"></i> Consultar Catálogo</a>
-                    </div>
-                    <div><i class="fa-solid fa-microchip" style="font-size: 8rem; color: #333;"></i></div>
-                </div>
-
-                <!-- Banner 3 -->
-                <div class="hero-slide">
-                    <div class="hero-text">
-                        <h1>Envíos a Córdoba y Todo el País</h1>
-                        <p>Embalaje seguro y entregas rápidas para que recibas tus impresiones sin complicaciones.</p>
-                        <a href="https://wa.me/" class="btn-main"><i class="fa-solid fa-truck-fast"></i> Consultar Costo de Envío</a>
-                    </div>
-                    <div><i class="fa-solid fa-box-open" style="font-size: 8rem; color: #333;"></i></div>
-                </div>
-
-                <!-- Banner 4 -->
-                <div class="hero-slide">
-                    <div class="hero-text">
-                        <h1>Venta de Filamentos y Repuestos</h1>
-                        <p>Insumos seleccionados para makers y talleres. PLA, PETG, ABS y componentes de precisión.</p>
-                        <a href="https://wa.me/" class="btn-main"><i class="fa-solid fa-layer-group"></i> Ver Insumos</a>
-                    </div>
-                    <div><i class="fa-solid fa-cubes" style="font-size: 8rem; color: #333;"></i></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 1. Productos Recién Agregados -->
-    <section class="categories-slider">
-        <h2 class="section-title">Productos Recién Agregados</h2>
-        <div class="carousel-wrapper" style="position: relative; padding: 0 25px;">
-            <button class="arrow-btn arrow-left" id="prevBtn-recien" onclick="moveCarousel(-1, 'carousel-recien')" style="left: -15px;">
+        <!-- Hero Banner Carrusel de 4 -->
+        <div class="hero-wrapper">
+            <button class="hero-arrow prev" onclick="userMoveHero(-1)">
                 <i class="fa-solid fa-chevron-left"></i>
             </button>
-            
-            <div class="product-carousel" id="carousel-recien">
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-key fa-3x" style="color: var(--primary);"></i></div><h4>Llavero Custom Logo</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Diseños y marcas a pedido</p><div class="price">$ 1.500</div></div>
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-cookie-bite fa-3x" style="color: var(--primary);"></i></div><h4>Cortante Personalizado</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Apto para repostería</p><div class="price">$ 2.000</div></div>
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-gamepad fa-3x" style="color: var(--primary);"></i></div><h4>Soporte Joystick PS5</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Impreso en PLA reforzado</p><div class="price">$ 3.800</div></div>
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-headset fa-3x" style="color: var(--primary);"></i></div><h4>Soporte Auriculares</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Soporte de escritorio</p><div class="price">$ 4.200</div></div>
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-desktop fa-3x" style="color: var(--primary);"></i></div><h4>Elevador de Monitor</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Soporte ergonómico</p><div class="price">$ 5.500</div></div>
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-box fa-3x" style="color: var(--primary);"></i></div><h4>Caja Organizadora SD</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Para tarjetas y memorias</p><div class="price">$ 1.800</div></div>
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-fan fa-3x" style="color: var(--primary);"></i></div><h4>Tobera Fan 5015</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Mejora de flujo de aire</p><div class="price">$ 2.200</div></div>
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-mobile-screen fa-3x" style="color: var(--primary);"></i></div><h4>Soporte Celular Desk</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Ángulo ajustable</p><div class="price">$ 2.500</div></div>
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-cable-car fa-3x" style="color: var(--primary);"></i></div><h4>Guía de Cables Mod</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Organizador para setup</p><div class="price">$ 1.200</div></div>
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-lightbulb fa-3x" style="color: var(--primary);"></i></div><h4>Lámpara Litofanía</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Foto personalizable 3D</p><div class="price">$ 8.000</div></div>
-            </div>
-
-            <button class="arrow-btn arrow-right" id="nextBtn-recien" onclick="moveCarousel(1, 'carousel-recien')" style="right: -15px;">
+            <button class="hero-arrow next" onclick="userMoveHero(1)">
                 <i class="fa-solid fa-chevron-right"></i>
             </button>
-        </div>
-    </section>
 
-    <!-- 2. Productos Destacados -->
-    <section class="products-section">
-        <h2 class="section-title">Productos Destacados</h2>
-        <div class="carousel-wrapper" style="position: relative; padding: 0 25px;">
-            <button class="arrow-btn arrow-left" id="prevBtn-destacados" onclick="moveCarousel(-1, 'carousel-destacados')" style="left: -15px;">
-                <i class="fa-solid fa-chevron-left"></i>
-            </button>
+            <div class="hero-container">
+                <div class="hero-slider" id="heroSlider">
+                    <!-- Banner 1 -->
+                    <div class="hero-slide">
+                        <div class="hero-text">
+                            <h1>Impresión 3D Personalizada</h1>
+                            <p>Enviamos tus diseños o ideas para imprimir bajo pedido. Repuestos técnicos, prototipos y piezas mecánicas a medida.</p>
+                            <a href="https://wa.me/" class="btn-main"><i class="fa-brands fa-whatsapp"></i> Pedir Cotización Directa</a>
+                        </div>
+                        <div><i class="fa-solid fa-gears" style="font-size: 8rem; color: #333;"></i></div>
+                    </div>
 
-            <div class="product-carousel" id="carousel-destacados">
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-gear fa-3x"></i></div><h4>Engranaje Técnico PETG</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Alta resistencia mecánica</p><div class="price">$ 4.500</div></div>
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-microchip fa-3x"></i></div><h4>Gabinete Electrónico</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Diseño custom para PCB</p><div class="price">$ 6.200</div></div>
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-robot fa-3x"></i></div><h4>Figura Alta Resina</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Detalle nivel coleccionista</p><div class="price">$ 12.000</div></div>
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-dragon fa-3x"></i></div><h4>Dragón Articulado</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Impresión multicolor</p><div class="price">$ 7.500</div></div>
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-wrench fa-3x"></i></div><h4>Polea de Precisión</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Para motores Nema</p><div class="price">$ 3.100</div></div>
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-chess-knight fa-3x"></i></div><h4>Juego Ajedrez 3D</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Diseño temático</p><div class="price">$ 14.000</div></div>
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-plug fa-3x"></i></div><h4>Adaptador Riel DIN</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Para tableros</p><div class="price">$ 2.400</div></div>
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-masks-theater fa-3x"></i></div><h4>Máscara Cosplay</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Escala 1:1 real</p><div class="price">$ 18.500</div></div>
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-shield-halved fa-3x"></i></div><h4>Protector de Cable</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Guía articulada</p><div class="price">$ 2.700</div></div>
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-gem fa-3x"></i></div><h4>Cristal Lámpara 3D</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Con base iluminada</p><div class="price">$ 11.000</div></div>
+                    <!-- Banner 2 -->
+                    <div class="hero-slide">
+                        <div class="hero-text">
+                            <h1>Modelado en Resina de Alta Definición</h1>
+                            <p>Figuras coleccionables, prototipos finos y piezas con detalle superior nivel profesional.</p>
+                            <a href="https://wa.me/" class="btn-main"><i class="fa-solid fa-robot"></i> Consultar Catálogo</a>
+                        </div>
+                        <div><i class="fa-solid fa-microchip" style="font-size: 8rem; color: #333;"></i></div>
+                    </div>
+
+                    <!-- Banner 3 -->
+                    <div class="hero-slide">
+                        <div class="hero-text">
+                            <h1>Envíos a Córdoba y Todo el País</h1>
+                            <p>Embalaje seguro y entregas rápidas para que recibas tus impresiones sin complicaciones.</p>
+                            <a href="https://wa.me/" class="btn-main"><i class="fa-solid fa-truck-fast"></i> Consultar Costo de Envío</a>
+                        </div>
+                        <div><i class="fa-solid fa-box-open" style="font-size: 8rem; color: #333;"></i></div>
+                    </div>
+
+                    <!-- Banner 4 -->
+                    <div class="hero-slide">
+                        <div class="hero-text">
+                            <h1>Venta de Filamentos y Repuestos</h1>
+                            <p>Insumos seleccionados para makers y talleres. PLA, PETG, ABS y componentes de precisión.</p>
+                            <a href="https://wa.me/" class="btn-main"><i class="fa-solid fa-layer-group"></i> Ver Insumos</a>
+                        </div>
+                        <div><i class="fa-solid fa-cubes" style="font-size: 8rem; color: #333;"></i></div>
+                    </div>
+                </div>
             </div>
-
-            <button class="arrow-btn arrow-right" id="nextBtn-destacados" onclick="moveCarousel(1, 'carousel-destacados')" style="right: -15px;">
-                <i class="fa-solid fa-chevron-right"></i>
-            </button>
         </div>
-    </section>
 
-    <!-- 3. Variedad del Día -->
-    <section class="products-section">
-        <h2 class="section-title">Variedad del Día</h2>
-        <div class="carousel-wrapper" style="position: relative; padding: 0 25px;">
-            <button class="arrow-btn arrow-left" id="prevBtn-variedad" onclick="moveCarousel(-1, 'carousel-variedad')" style="left: -15px;">
-                <i class="fa-solid fa-chevron-left"></i>
-            </button>
+        <!-- 1. Productos Recién Agregados -->
+        <section class="categories-slider">
+            <h2 class="section-title">Productos Recién Agregados</h2>
+            <div class="carousel-wrapper" style="position: relative; padding: 0 25px;">
+                <button class="arrow-btn arrow-left" id="prevBtn-recien" onclick="moveCarousel(-1, 'carousel-recien')" style="left: -15px;">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                
+                <div class="product-carousel" id="carousel-recien">
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-key fa-3x" style="color: var(--primary);"></i></div><h4>Llavero Custom Logo</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Diseños y marcas a pedido</p><div class="price">$ 1.500</div></div>
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-cookie-bite fa-3x" style="color: var(--primary);"></i></div><h4>Cortante Personalizado</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Apto para repostería</p><div class="price">$ 2.000</div></div>
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-gamepad fa-3x" style="color: var(--primary);"></i></div><h4>Soporte Joystick PS5</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Impreso en PLA reforzado</p><div class="price">$ 3.800</div></div>
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-headset fa-3x" style="color: var(--primary);"></i></div><h4>Soporte Auriculares</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Soporte de escritorio</p><div class="price">$ 4.200</div></div>
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-desktop fa-3x" style="color: var(--primary);"></i></div><h4>Elevador de Monitor</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Soporte ergonómico</p><div class="price">$ 5.500</div></div>
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-box fa-3x" style="color: var(--primary);"></i></div><h4>Caja Organizadora SD</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Para tarjetas y memorias</p><div class="price">$ 1.800</div></div>
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-fan fa-3x" style="color: var(--primary);"></i></div><h4>Tobera Fan 5015</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Mejora de flujo de aire</p><div class="price">$ 2.200</div></div>
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-mobile-screen fa-3x" style="color: var(--primary);"></i></div><h4>Soporte Celular Desk</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Ángulo ajustable</p><div class="price">$ 2.500</div></div>
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-cable-car fa-3x" style="color: var(--primary);"></i></div><h4>Guía de Cables Mod</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Organizador para setup</p><div class="price">$ 1.200</div></div>
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-lightbulb fa-3x" style="color: var(--primary);"></i></div><h4>Lámpara Litofanía</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Foto personalizable 3D</p><div class="price">$ 8.000</div></div>
+                </div>
 
-            <div class="product-carousel" id="carousel-variedad">
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-car-battery fa-3x"></i></div><h4>Tapa de Batería Mod</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Repuesto a medida</p><div class="price">$ 3.500</div></div>
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-skull fa-3x"></i></div><h4>Busto Gamer Custom</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Pintado a mano</p><div class="price">$ 15.000</div></div>
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-industry fa-3x"></i></div><h4>Acople Flexible</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Eje de transmisión</p><div class="price">$ 3.900</div></div>
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-wand-magic-sparkles fa-3x"></i></div><h4>Varita Mágica</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Textura madera</p><div class="price">$ 6.800</div></div>
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-grip fa-3x"></i></div><h4>Empuñadura Ergonomica</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Diseño industrial</p><div class="price">$ 4.800</div></div>
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-monument fa-3x"></i></div><h4>Diorama Setup LED</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Base con luz</p><div class="price">$ 22.000</div></div>
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-layer-group fa-3x"></i></div><h4>Espaciadores PETG</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Pack x10 piezas</p><div class="price">$ 1.900</div></div>
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-hat-wizard fa-3x"></i></div><h4>Minis D&D (Pack x4)</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Resina definición</p><div class="price">$ 9.200</div></div>
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-screwdriver-wrench fa-3x"></i></div><h4>Soporte de Sensor</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Impreso en ABS</p><div class="price">$ 2.800</div></div>
-                <div class="product-card"><div class="product-img"><i class="fa-solid fa-crown fa-3x"></i></div><h4>Réplica Casco Mod</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Edición especial</p><div class="price">$ 25.000</div></div>
+                <button class="arrow-btn arrow-right" id="nextBtn-recien" onclick="moveCarousel(1, 'carousel-recien')" style="right: -15px;">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
             </div>
+        </section>
 
-            <button class="arrow-btn arrow-right" id="nextBtn-variedad" onclick="moveCarousel(1, 'carousel-variedad')" style="right: -15px;">
-                <i class="fa-solid fa-chevron-right"></i>
-            </button>
+        <!-- 2. Productos Destacados -->
+        <section class="products-section">
+            <h2 class="section-title">Productos Destacados</h2>
+            <div class="carousel-wrapper" style="position: relative; padding: 0 25px;">
+                <button class="arrow-btn arrow-left" id="prevBtn-destacados" onclick="moveCarousel(-1, 'carousel-destacados')" style="left: -15px;">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+
+                <div class="product-carousel" id="carousel-destacados">
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-gear fa-3x"></i></div><h4>Engranaje Técnico PETG</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Alta resistencia mecánica</p><div class="price">$ 4.500</div></div>
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-microchip fa-3x"></i></div><h4>Gabinete Electrónico</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Diseño custom para PCB</p><div class="price">$ 6.200</div></div>
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-robot fa-3x"></i></div><h4>Figura Alta Resina</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Detalle nivel coleccionista</p><div class="price">$ 12.000</div></div>
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-dragon fa-3x"></i></div><h4>Dragón Articulado</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Impresión multicolor</p><div class="price">$ 7.500</div></div>
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-wrench fa-3x"></i></div><h4>Polea de Precisión</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Para motores Nema</p><div class="price">$ 3.100</div></div>
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-chess-knight fa-3x"></i></div><h4>Juego Ajedrez 3D</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Diseño temático</p><div class="price">$ 14.000</div></div>
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-plug fa-3x"></i></div><h4>Adaptador Riel DIN</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Para tableros</p><div class="price">$ 2.400</div></div>
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-masks-theater fa-3x"></i></div><h4>Máscara Cosplay</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Escala 1:1 real</p><div class="price">$ 18.500</div></div>
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-shield-halved fa-3x"></i></div><h4>Protector de Cable</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Guía articulada</p><div class="price">$ 2.700</div></div>
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-gem fa-3x"></i></div><h4>Cristal Lámpara 3D</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Con base iluminada</p><div class="price">$ 11.000</div></div>
+                </div>
+
+                <button class="arrow-btn arrow-right" id="nextBtn-destacados" onclick="moveCarousel(1, 'carousel-destacados')" style="right: -15px;">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- 3. Variedad del Día -->
+        <section class="products-section">
+            <h2 class="section-title">Variedad del Día</h2>
+            <div class="carousel-wrapper" style="position: relative; padding: 0 25px;">
+                <button class="arrow-btn arrow-left" id="prevBtn-variedad" onclick="moveCarousel(-1, 'carousel-variedad')" style="left: -15px;">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+
+                <div class="product-carousel" id="carousel-variedad">
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-car-battery fa-3x"></i></div><h4>Tapa de Batería Mod</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Repuesto a medida</p><div class="price">$ 3.500</div></div>
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-skull fa-3x"></i></div><h4>Busto Gamer Custom</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Pintado a mano</p><div class="price">$ 15.000</div></div>
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-industry fa-3x"></i></div><h4>Acople Flexible</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Eje de transmisión</p><div class="price">$ 3.900</div></div>
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-wand-magic-sparkles fa-3x"></i></div><h4>Varita Mágica</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Textura madera</p><div class="price">$ 6.800</div></div>
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-grip fa-3x"></i></div><h4>Empuñadura Ergonomica</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Diseño industrial</p><div class="price">$ 4.800</div></div>
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-monument fa-3x"></i></div><h4>Diorama Setup LED</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Base con luz</p><div class="price">$ 22.000</div></div>
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-layer-group fa-3x"></i></div><h4>Espaciadores PETG</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Pack x10 piezas</p><div class="price">$ 1.900</div></div>
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-hat-wizard fa-3x"></i></div><h4>Minis D&D (Pack x4)</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Resina definición</p><div class="price">$ 9.200</div></div>
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-screwdriver-wrench fa-3x"></i></div><h4>Soporte de Sensor</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Impreso en ABS</p><div class="price">$ 2.800</div></div>
+                    <div class="product-card"><div class="product-img"><i class="fa-solid fa-crown fa-3x"></i></div><h4>Réplica Casco Mod</h4><p style="font-size: 0.8rem; color: var(--text-gray);">Edición especial</p><div class="price">$ 25.000</div></div>
+                </div>
+
+                <button class="arrow-btn arrow-right" id="nextBtn-variedad" onclick="moveCarousel(1, 'carousel-variedad')" style="right: -15px;">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- VISTA DEDICADA /login -->
+    <main id="view-login" class="view-hidden">
+        <div class="login-container">
+            <!-- MARCO Y RECUADRO CENTRAL -->
+            <div class="login-card-frame">
+                <i class="fa-solid fa-shield-halved" style="font-size: 2.8rem; color: var(--primary); margin-bottom: 12px;"></i>
+                <h2>Iniciar Sesión en Forja 3D</h2>
+                
+                <div class="login-security-box">
+                    <i class="fa-solid fa-lock" style="color: var(--primary); margin-right: 6px;"></i>
+                    Utilizamos únicamente el método oficial de Google para garantizar la seguridad total de tu cuenta, contraseñas y datos sensibles. De esta forma, tus credenciales quedan bajo la máxima protección directa de Google y no se almacenan en nuestro sitio.
+                </div>
+
+                <button class="btn-google-large" onclick="alert('Conectando con Google...')">
+                    <i class="fa-brands fa-google" style="color: #ea4335; font-size: 1.2rem;"></i> Continuar con Google
+                </button>
+                
+                <a href="/" onclick="event.preventDefault(); navigateTo('/');" style="display: inline-block; margin-top: 22px; color: var(--text-gray); font-size: 0.85rem; text-decoration: none;">
+                    <i class="fa-solid fa-arrow-left"></i> Volver a la tienda
+                </a>
+            </div>
         </div>
-    </section>
+    </main>
 
     <!-- Footer -->
     <footer>
