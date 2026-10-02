@@ -166,49 +166,7 @@
         /* Mensaje explicativo debajo del campo */
         .error-msg-text { color: #ef4444; font-size: 0.78rem; font-weight: 600; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
     </style>
-
-    <!-- Carga de SDKs de Firebase desde CDN (Módulos ES6) -->
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-      import { 
-        getAuth, 
-        GoogleAuthProvider, 
-        signInWithPopup, 
-        signOut, 
-        onAuthStateChanged 
-      } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-      import { 
-        getFirestore, 
-        doc, 
-        getDoc, 
-        setDoc 
-      } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-      // Configuración de tu aplicación web
-      const firebaseConfig = {
-        apiKey: "AIzaSyBGqKkygGc4li3fH7ox7K6xTZIDrlviMRc",
-        authDomain: "forja3d-tienda.firebaseapp.com",
-        projectId: "forja3d-tienda",
-        storageBucket: "forja3d-tienda.firebasestorage.app",
-        messagingSenderId: "877270270448",
-        appId: "1:877270270448:web:b9968b8d939f2b317d1d35"
-      };
-
-      // Inicializar Firebase
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const db = getFirestore(app);
-      const googleProvider = new GoogleAuthProvider();
-
-      // Exponer las instancias globalmente para usarlas desde tus funciones JS
-      window.fbAuth = auth;
-      window.fbDb = db;
-      window.googleProvider = googleProvider;
-      window.fbAuthSDK = { signInWithPopup, signOut, onAuthStateChanged };
-      window.fbFirestoreSDK = { doc, getDoc, setDoc };
-    </script>
 </head>
-
 <script>
     /* Lógica Carruseles */
     function moveCarousel(direction, carouselId) {
@@ -273,7 +231,7 @@
             userIcon.style.color = "var(--primary)";
             dropdown.innerHTML = `
                 <div style="border-bottom: 1px solid #333; padding-bottom: 8px; text-align: left;">
-                    <strong style="color:#fff; font-size:1.05rem; display:block;">¡Hola, ${user.nombre || 'Usuario'}!</strong>
+                    <strong style="color:#fff; font-size:1.05rem; display:block;">¡Hola, ${user.nombre}!</strong>
                     <span style="font-size: 0.82rem; color: var(--accent-green); display: flex; align-items: center; gap: 5px; margin-top: 4px;">
                         <i class="fa-solid fa-star"></i> Puntos Forja: <strong>0 pts</strong>
                     </span>
@@ -341,91 +299,17 @@
         parent.appendChild(errorDiv);
     }
 
-    /* Login & Perfil con Firebase */
+    /* Login & Perfil */
+    function simulateGoogleAuth() {
+        document.getElementById('step-google').classList.add('view-hidden');
+        document.getElementById('step-profile').classList.remove('view-hidden');
 
-    // Escuchar cambios de sesión al cargar la página
-    window.fbAuthSDK.onAuthStateChanged(window.fbAuth, async (user) => {
-        if (user) {
-            console.log("Usuario autenticado en Firebase:", user.email);
-
-            const emailInput = document.getElementById('input-email');
-            if (emailInput) {
-                emailInput.value = user.email || "";
-                emailInput.readOnly = true;
-            }
-
-            // Consultar en Firestore si el perfil ya existe
-            try {
-                const { doc, getDoc } = window.fbFirestoreSDK;
-                const userRef = doc(window.fbDb, "users", user.uid);
-                const docSnap = await getDoc(userRef);
-
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    localStorage.setItem('forja3d_user', JSON.stringify(data));
-                    renderUserStatus();
-
-                    if (document.getElementById('input-nombre')) document.getElementById('input-nombre').value = data.nombre || "";
-                    if (document.getElementById('input-apellido')) document.getElementById('input-apellido').value = data.apellido || "";
-                    if (document.getElementById('input-telefono')) document.getElementById('input-telefono').value = data.telefono || "";
-
-                    // Redirigir si está en /login y ya completó el registro
-                    if (window.location.pathname === '/login') {
-                        navigateTo('/');
-                    } else if (window.location.pathname === '/mi-cuenta') {
-                        handleRoute('/mi-cuenta');
-                    }
-                } else {
-                    // Si no existe perfil en Firestore, mostrar paso 2 de completar perfil
-                    localStorage.removeItem('forja3d_user');
-                    renderUserStatus();
-                    document.getElementById('step-google')?.classList.add('view-hidden');
-                    document.getElementById('step-profile')?.classList.remove('view-hidden');
-                    
-                    if (document.getElementById('input-nombre')) document.getElementById('input-nombre').value = "";
-                    if (document.getElementById('input-apellido')) document.getElementById('input-apellido').value = "";
-                    if (document.getElementById('input-telefono')) document.getElementById('input-telefono').value = "";
-                }
-            } catch (err) {
-                console.error("Error al obtener documento de Firestore:", err);
-            }
-
-        } else {
-            localStorage.removeItem('forja3d_user');
-            renderUserStatus();
-            document.getElementById('step-google')?.classList.remove('view-hidden');
-            document.getElementById('step-profile')?.classList.add('view-hidden');
-            
-            if (window.location.pathname === '/mi-cuenta') {
-                navigateTo('/login');
-            }
-        }
-    });
-
-    // Función ejecutada al presionar "Continuar con Google"
-    async function loginWithGoogle() {
-        try {
-            await window.fbAuthSDK.signInWithPopup(window.fbAuth, window.googleProvider);
-        } catch (error) {
-            console.error("Error al iniciar sesión con Google:", error);
-            alert("Hubo un problema al iniciar sesión: " + error.message);
-        }
+        document.getElementById('input-email').value = "usuario.demo@gmail.com";
+        document.getElementById('input-nombre').value = "Santiago";
+        document.getElementById('input-apellido').value = "";
     }
 
-    // Función para Cerrar Sesión
-    async function logoutUser() {
-        try {
-            await window.fbAuthSDK.signOut(window.fbAuth);
-            localStorage.removeItem('forja3d_user');
-            renderUserStatus();
-            navigateTo('/');
-        } catch (error) {
-            console.error("Error al cerrar sesión:", error);
-        }
-    }
-
-    // Guardar perfil inicial en Firestore y localStorage
-    async function saveUserProfile(e) {
+    function saveUserProfile(e) {
         e.preventDefault();
         const nombreInput = document.getElementById('input-nombre');
         const apellidoInput = document.getElementById('input-apellido');
@@ -449,31 +333,16 @@
 
         if (hasError) return;
 
-        const currentUser = window.fbAuth.currentUser;
-        if (!currentUser) return;
-
         const userData = {
-            uid: currentUser.uid,
             nombre: nombreInput.value.trim(),
             apellido: apellidoInput.value.trim(),
             telefono: telefonoInput.value.trim(),
-            email: email,
-            role: 'client',
-            updatedAt: new Date().toISOString()
+            email: email
         };
 
-        try {
-            const { doc, setDoc } = window.fbFirestoreSDK;
-            const userRef = doc(window.fbDb, "users", currentUser.uid);
-            await setDoc(userRef, userData, { merge: true });
-
-            localStorage.setItem('forja3d_user', JSON.stringify(userData));
-            renderUserStatus();
-            navigateTo('/');
-        } catch (err) {
-            console.error("Error al guardar en Firestore:", err);
-            alert("Error al guardar el perfil en la base de datos.");
-        }
+        localStorage.setItem('forja3d_user', JSON.stringify(userData));
+        renderUserStatus();
+        navigateTo('/');
     }
 
     /* Modo Edición en /mi-cuenta */
@@ -483,7 +352,7 @@
         document.getElementById('acc-telefono').removeAttribute('disabled');
 
         document.getElementById('btn-edit-account').classList.add('view-hidden');
-        document.getElementById('account-edit-actions').style.display = 'flex';
+        document.getElementById('account-edit-actions').classList.remove('view-hidden');
         document.getElementById('acc-nombre').focus();
     }
 
@@ -503,11 +372,11 @@
         document.getElementById('acc-telefono').setAttribute('disabled', 'true');
 
         document.getElementById('btn-edit-account').classList.remove('view-hidden');
-        document.getElementById('account-edit-actions').style.display = 'none';
+        document.getElementById('account-edit-actions').classList.add('view-hidden');
         document.getElementById('acc-feedback').style.display = 'none';
     }
 
-    async function updateAccountData(e) {
+    function updateAccountData(e) {
         e.preventDefault();
         const user = getUserData();
         if (!user) return;
@@ -537,17 +406,6 @@
         user.apellido = apellidoInput.value.trim();
         user.telefono = telefonoInput.value.trim();
 
-        const currentUser = window.fbAuth.currentUser;
-        if (currentUser) {
-            try {
-                const { doc, setDoc } = window.fbFirestoreSDK;
-                const userRef = doc(window.fbDb, "users", currentUser.uid);
-                await setDoc(userRef, user, { merge: true });
-            } catch (err) {
-                console.error("Error al actualizar Firestore:", err);
-            }
-        }
-
         localStorage.setItem('forja3d_user', JSON.stringify(user));
         renderUserStatus();
 
@@ -556,11 +414,17 @@
         telefonoInput.setAttribute('disabled', 'true');
 
         document.getElementById('btn-edit-account').classList.remove('view-hidden');
-        document.getElementById('account-edit-actions').style.display = 'none';
+        document.getElementById('account-edit-actions').classList.add('view-hidden');
 
         const feedback = document.getElementById('acc-feedback');
         feedback.style.display = 'block';
         setTimeout(() => { feedback.style.display = 'none'; }, 3000);
+    }
+
+    function logoutUser() {
+        localStorage.removeItem('forja3d_user');
+        renderUserStatus();
+        navigateTo('/');
     }
 
     /* Navegación SPA */
@@ -586,15 +450,8 @@
             document.body.classList.add('mode-clean');
             if (user) { navigateTo('/'); return; }
             if (viewLogin) viewLogin.classList.remove('view-hidden');
-            
-            // Evaluar estado para redireccionar internamente dentro del flujo
-            if (window.fbAuth && window.fbAuth.currentUser && !user) {
-                document.getElementById('step-google').classList.add('view-hidden');
-                document.getElementById('step-profile').classList.remove('view-hidden');
-            } else {
-                document.getElementById('step-google').classList.remove('view-hidden');
-                document.getElementById('step-profile').classList.add('view-hidden');
-            }
+            document.getElementById('step-google').classList.remove('view-hidden');
+            document.getElementById('step-profile').classList.add('view-hidden');
             window.scrollTo(0, 0);
         } else if (path === '/mi-cuenta') {
             document.body.classList.add('mode-clean');
@@ -606,12 +463,13 @@
             document.getElementById('acc-apellido').value = user.apellido || '';
             document.getElementById('acc-telefono').value = user.telefono || '';
 
+            // Deshabilitar campos al ingresar por defecto
             document.getElementById('acc-nombre').setAttribute('disabled', 'true');
             document.getElementById('acc-apellido').setAttribute('disabled', 'true');
             document.getElementById('acc-telefono').setAttribute('disabled', 'true');
             
             document.getElementById('btn-edit-account').classList.remove('view-hidden');
-            document.getElementById('account-edit-actions').style.display = 'none';
+            document.getElementById('account-edit-actions').classList.add('view-hidden');
             clearFieldError(document.getElementById('acc-nombre'));
             clearFieldError(document.getElementById('acc-apellido'));
 
@@ -635,7 +493,6 @@
         handleRoute(window.location.pathname);
     });
 </script>
-
 <body>
 
     <!-- Top Bar (Tienda) -->
@@ -802,7 +659,7 @@
                     Utilizamos únicamente el método oficial de Google para garantizar la seguridad total de tu cuenta y datos.
                 </div>
 
-                <button class="btn-google-large" onclick="loginWithGoogle()">
+                <button class="btn-google-large" onclick="simulateGoogleAuth()">
                     <i class="fa-brands fa-google" style="color: #ea4335; font-size: 1.2rem;"></i> Continuar con Google
                 </button>
                 
@@ -897,7 +754,7 @@
                     </button>
 
                     <!-- BOTONES MODO EDICIÓN -->
-                    <div id="account-edit-actions" style="display: none; gap: 10px; margin-top: 10px;">
+                    <div id="account-edit-actions" class="view-hidden" style="display: flex; gap: 10px; margin-top: 10px;">
                         <button type="button" class="dropdown-item-btn" style="text-align: center; justify-content: center;" onclick="cancelAccountEditing()">
                             Cancelar
                         </button>
