@@ -158,6 +158,13 @@
 
         footer { background: #0c0c0c; padding: 40px 5% 20px; margin-top: 40px; border-top: 1px solid #222; font-size: 0.9rem; color: var(--text-gray); }
         .footer-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px; }
+
+        /* Animación de sacudida para campos incompletos */
+        @keyframes shakeError { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+        /* Estado de campo con error */
+        .input-error { border: 2px solid #ef4444 !important; background-color: rgba(239, 68, 68, 0.08) !important; animation: shakeError 0.4s ease-in-out; }
+        /* Mensaje explicativo debajo del campo */
+        .error-msg-text { color: #ef4444; font-size: 0.78rem; font-weight: 600; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
     </style>
 </head>
 <script>
@@ -267,6 +274,31 @@
         }
     });
 
+    /* Helper reutilizable de validación de errores */
+    function clearFieldError(input) {
+        if (!input) return;
+        input.classList.remove('input-error');
+        const parent = input.parentElement;
+        const existingMsg = parent.querySelector('.error-msg-text');
+        if (existingMsg) {
+            existingMsg.remove();
+        }
+    }
+
+    function showFieldError(input, message = 'Campo obligatorio, por favor completar') {
+        if (!input) return;
+        clearFieldError(input);
+        input.classList.add('input-error');
+        
+        input.addEventListener('input', () => clearFieldError(input), { once: true });
+
+        const parent = input.parentElement;
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-msg-text';
+        errorDiv.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${message}`;
+        parent.appendChild(errorDiv);
+    }
+
     /* Login & Perfil */
     function simulateGoogleAuth() {
         document.getElementById('step-google').classList.add('view-hidden');
@@ -279,21 +311,69 @@
 
     function saveUserProfile(e) {
         e.preventDefault();
-        const nombre = document.getElementById('input-nombre').value.trim();
-        const apellido = document.getElementById('input-apellido').value.trim();
-        const telefono = document.getElementById('input-telefono').value.trim();
+        const nombreInput = document.getElementById('input-nombre');
+        const apellidoInput = document.getElementById('input-apellido');
+        const telefonoInput = document.getElementById('input-telefono');
         const email = document.getElementById('input-email').value;
 
-        if (!nombre || !apellido) {
-            alert('Por favor completá tu Nombre y Apellido.');
-            return;
+        let hasError = false;
+
+        clearFieldError(nombreInput);
+        clearFieldError(apellidoInput);
+
+        if (!nombreInput.value.trim()) {
+            showFieldError(nombreInput, 'Campo obligatorio, por favor completar');
+            hasError = true;
         }
 
-        const userData = { nombre, apellido, telefono, email };
-        localStorage.setItem('forja3d_user', JSON.stringify(userData));
+        if (!apellidoInput.value.trim()) {
+            showFieldError(apellidoInput, 'Campo obligatorio, por favor completar');
+            hasError = true;
+        }
 
+        if (hasError) return;
+
+        const userData = {
+            nombre: nombreInput.value.trim(),
+            apellido: apellidoInput.value.trim(),
+            telefono: telefonoInput.value.trim(),
+            email: email
+        };
+
+        localStorage.setItem('forja3d_user', JSON.stringify(userData));
         renderUserStatus();
         navigateTo('/');
+    }
+
+    /* Modo Edición en /mi-cuenta */
+    function enableAccountEditing() {
+        document.getElementById('acc-nombre').removeAttribute('disabled');
+        document.getElementById('acc-apellido').removeAttribute('disabled');
+        document.getElementById('acc-telefono').removeAttribute('disabled');
+
+        document.getElementById('btn-edit-account').classList.add('view-hidden');
+        document.getElementById('account-edit-actions').classList.remove('view-hidden');
+        document.getElementById('acc-nombre').focus();
+    }
+
+    function cancelAccountEditing() {
+        const user = getUserData();
+        if (user) {
+            document.getElementById('acc-nombre').value = user.nombre || '';
+            document.getElementById('acc-apellido').value = user.apellido || '';
+            document.getElementById('acc-telefono').value = user.telefono || '';
+        }
+
+        clearFieldError(document.getElementById('acc-nombre'));
+        clearFieldError(document.getElementById('acc-apellido'));
+
+        document.getElementById('acc-nombre').setAttribute('disabled', 'true');
+        document.getElementById('acc-apellido').setAttribute('disabled', 'true');
+        document.getElementById('acc-telefono').setAttribute('disabled', 'true');
+
+        document.getElementById('btn-edit-account').classList.remove('view-hidden');
+        document.getElementById('account-edit-actions').classList.add('view-hidden');
+        document.getElementById('acc-feedback').style.display = 'none';
     }
 
     function updateAccountData(e) {
@@ -301,22 +381,41 @@
         const user = getUserData();
         if (!user) return;
 
-        const nombre = document.getElementById('acc-nombre').value.trim();
-        const apellido = document.getElementById('acc-apellido').value.trim();
-        const telefono = document.getElementById('acc-telefono').value.trim();
+        const nombreInput = document.getElementById('acc-nombre');
+        const apellidoInput = document.getElementById('acc-apellido');
+        const telefonoInput = document.getElementById('acc-telefono');
 
-        if (!nombre || !apellido) {
-            alert('Por favor completá tu Nombre y Apellido.');
-            return;
+        let hasError = false;
+
+        clearFieldError(nombreInput);
+        clearFieldError(apellidoInput);
+
+        if (!nombreInput.value.trim()) {
+            showFieldError(nombreInput, 'Campo obligatorio, por favor completar');
+            hasError = true;
         }
 
-        user.nombre = nombre;
-        user.apellido = apellido;
-        user.telefono = telefono;
+        if (!apellidoInput.value.trim()) {
+            showFieldError(apellidoInput, 'Campo obligatorio, por favor completar');
+            hasError = true;
+        }
+
+        if (hasError) return;
+
+        user.nombre = nombreInput.value.trim();
+        user.apellido = apellidoInput.value.trim();
+        user.telefono = telefonoInput.value.trim();
 
         localStorage.setItem('forja3d_user', JSON.stringify(user));
         renderUserStatus();
-        
+
+        nombreInput.setAttribute('disabled', 'true');
+        apellidoInput.setAttribute('disabled', 'true');
+        telefonoInput.setAttribute('disabled', 'true');
+
+        document.getElementById('btn-edit-account').classList.remove('view-hidden');
+        document.getElementById('account-edit-actions').classList.add('view-hidden');
+
         const feedback = document.getElementById('acc-feedback');
         feedback.style.display = 'block';
         setTimeout(() => { feedback.style.display = 'none'; }, 3000);
@@ -341,7 +440,6 @@
         const viewLogin = document.getElementById('view-login');
         const viewAccount = document.getElementById('view-account');
 
-        // Ocultar todas las vistas por defecto
         if (viewHome) viewHome.classList.add('view-hidden');
         if (viewLogin) viewLogin.classList.add('view-hidden');
         if (viewAccount) viewAccount.classList.add('view-hidden');
@@ -360,11 +458,21 @@
             if (!user) { navigateTo('/login'); return; }
             if (viewAccount) viewAccount.classList.remove('view-hidden');
             
-            // Cargar datos actuales en los inputs
             document.getElementById('acc-email').value = user.email || '';
             document.getElementById('acc-nombre').value = user.nombre || '';
             document.getElementById('acc-apellido').value = user.apellido || '';
             document.getElementById('acc-telefono').value = user.telefono || '';
+
+            // Deshabilitar campos al ingresar por defecto
+            document.getElementById('acc-nombre').setAttribute('disabled', 'true');
+            document.getElementById('acc-apellido').setAttribute('disabled', 'true');
+            document.getElementById('acc-telefono').setAttribute('disabled', 'true');
+            
+            document.getElementById('btn-edit-account').classList.remove('view-hidden');
+            document.getElementById('account-edit-actions').classList.add('view-hidden');
+            clearFieldError(document.getElementById('acc-nombre'));
+            clearFieldError(document.getElementById('acc-apellido'));
+
             window.scrollTo(0, 0);
         } else {
             document.body.classList.remove('mode-clean');
@@ -568,7 +676,7 @@
                     Tus datos nos ayudan a identificar tus pedidos y sumar Puntos Forja.
                 </p>
 
-                <form class="profile-form" onsubmit="saveUserProfile(event)">
+                <form class="profile-form" onsubmit="saveUserProfile(event)" novalidate>
                     <div class="form-group">
                         <label>Correo Electrónico (Google)</label>
                         <input type="email" id="input-email" disabled>
@@ -576,16 +684,16 @@
 
                     <div class="form-group">
                         <label>Nombre *</label>
-                        <input type="text" id="input-nombre" placeholder="Ej: Santiago" required>
+                        <input type="text" id="input-nombre" placeholder="Ej: Santiago">
                     </div>
 
                     <div class="form-group">
                         <label>Apellido *</label>
-                        <input type="text" id="input-apellido" placeholder="Ej: Mora" required>
+                        <input type="text" id="input-apellido" placeholder="Ej: Mora">
                     </div>
 
                     <div class="form-group">
-                        <label>Teléfono / WhatsApp (Opcional - Puntos Forja)</label>
+                        <label>Teléfono (Opcional - Para puntos)</label>
                         <input type="tel" id="input-telefono" placeholder="Ej: 3511234567">
                     </div>
 
@@ -612,10 +720,10 @@
                 <i class="fa-solid fa-user-gear" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 10px;"></i>
                 <h2>Mi Cuenta</h2>
                 <p style="font-size: 0.85rem; color: var(--text-gray); margin-bottom: 15px;">
-                    Gestioná tus datos personales de contacto.
+                    Información de perfil y contacto asociada a tu usuario.
                 </p>
 
-                <form class="profile-form" onsubmit="updateAccountData(event)">
+                <form class="profile-form" onsubmit="updateAccountData(event)" novalidate>
                     <div class="form-group">
                         <label>Correo Electrónico (Protegido por Google)</label>
                         <input type="email" id="acc-email" disabled>
@@ -623,26 +731,37 @@
 
                     <div class="form-group">
                         <label>Nombre *</label>
-                        <input type="text" id="acc-nombre" required>
+                        <input type="text" id="acc-nombre" disabled>
                     </div>
 
                     <div class="form-group">
                         <label>Apellido *</label>
-                        <input type="text" id="acc-apellido" required>
+                        <input type="text" id="acc-apellido" disabled>
                     </div>
 
                     <div class="form-group">
-                        <label>Teléfono / WhatsApp (Para Puntos y Envíos)</label>
-                        <input type="tel" id="acc-telefono" placeholder="Sin especificar">
+                        <label>Teléfono (Opcional - Para puntos)</label>
+                        <input type="tel" id="acc-telefono" placeholder="Sin especificar" disabled>
                     </div>
 
-                    <p id="acc-feedback" style="display: none; color: var(--accent-green); font-size: 0.85rem; text-align: center; font-weight: 500;">
+                    <p id="acc-feedback" style="display: none; color: var(--accent-green); font-size: 0.85rem; text-align: center; font-weight: 500; margin-top: 5px;">
                         <i class="fa-solid fa-circle-check"></i> ¡Datos actualizados con éxito!
                     </p>
 
-                    <button type="submit" class="btn-dropdown-action" style="margin-top: 10px; padding: 12px;">
-                        <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
+                    <!-- BOTÓN MODO LECTURA -->
+                    <button type="button" id="btn-edit-account" class="btn-dropdown-action" style="margin-top: 10px; padding: 12px;" onclick="enableAccountEditing()">
+                        <i class="fa-solid fa-pen-to-square"></i> Editar Información
                     </button>
+
+                    <!-- BOTONES MODO EDICIÓN -->
+                    <div id="account-edit-actions" class="view-hidden" style="display: flex; gap: 10px; margin-top: 10px;">
+                        <button type="button" class="dropdown-item-btn" style="text-align: center; justify-content: center;" onclick="cancelAccountEditing()">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn-dropdown-action" style="padding: 12px;">
+                            <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
+                        </button>
+                    </div>
                 </form>
 
                 <a href="/" onclick="event.preventDefault(); navigateTo('/');" style="display: inline-block; margin-top: 22px; color: var(--text-gray); font-size: 0.85rem; text-decoration: none;">
