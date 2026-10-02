@@ -35,50 +35,53 @@
         .user-menu-wrapper { position: relative; display: inline-block; }
         .user-dropdown {
             position: absolute; right: 0; top: 35px; background: #1e1e1e; border: 1px solid var(--primary);
-            border-radius: 8px; width: 250px; padding: 18px; display: none; flex-direction: column; gap: 12px;
+            border-radius: 8px; width: 250px; padding: 18px; display: none; flex-direction: column; gap: 10px;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6); z-index: 1000;
         }
         .user-dropdown.active { display: flex; }
         .user-dropdown p.dropdown-sub { font-size: 0.88rem; color: var(--text-light); line-height: 1.4; margin: 0; }
+        
+        .dropdown-item-btn {
+            background: transparent; color: var(--text-light); border: 1px solid #333; padding: 10px 14px; border-radius: 6px;
+            font-weight: 500; cursor: pointer; text-align: left; font-size: 0.88rem; transition: background 0.2s, border-color 0.2s;
+            display: flex; align-items: center; gap: 10px; width: 100%;
+        }
+        .dropdown-item-btn:hover { background: #2a2a2a; border-color: var(--primary); color: #fff; }
+
         .btn-dropdown-action {
             background: var(--primary); color: #fff; border: none; padding: 10px 14px; border-radius: 6px;
             font-weight: bold; cursor: pointer; text-align: center; font-size: 0.9rem; transition: transform 0.2s, background 0.2s;
             display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
         }
         .btn-dropdown-action:hover { transform: translateY(-2px); background: var(--primary-dark); }
-        .btn-dropdown-logout { background: #333; color: #ff5252; }
-        .btn-dropdown-logout:hover { background: #444; color: #ff7373; }
+        .btn-dropdown-logout { background: #2a2a2a; color: #ff5252; border: 1px solid #333; margin-top: 5px; }
+        .btn-dropdown-logout:hover { background: #3d1c1c; border-color: #ff5252; color: #ff7373; }
 
         /* Control de Visibilidad SPA */
         .view-hidden { display: none !important; }
 
-        /* MODO /login: PANTALLA LIMPIA Y CENTRADA */
-        body.mode-login .top-bar,
-        body.mode-login header,
-        body.mode-login nav,
-        body.mode-login .whatsapp-btn,
-        body.mode-login footer {
+        /* MODO PANTALLA LIMPIAS (/login y /mi-cuenta) */
+        body.mode-clean .top-bar,
+        body.mode-clean header,
+        body.mode-clean nav,
+        body.mode-clean .whatsapp-btn,
+        body.mode-clean footer {
             display: none !important;
         }
 
-        .login-wrapper {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+        .clean-wrapper {
+            min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;
         }
 
-        .login-brand-header { margin-bottom: 25px; text-align: center; cursor: pointer; }
-        .login-brand-header .logo-large { font-size: 2.5rem; font-weight: bold; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; gap: 12px; justify-content: center; }
+        .clean-brand-header { margin-bottom: 25px; text-align: center; cursor: pointer; }
+        .clean-brand-header .logo-large { font-size: 2.5rem; font-weight: bold; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; gap: 12px; justify-content: center; }
 
-        .login-card-frame {
+        .clean-card-frame {
             background: #181818; border: 1px solid var(--primary); border-radius: 14px;
             padding: 40px 32px; max-width: 460px; width: 100%; text-align: center;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
         }
-        .login-card-frame h2 { color: #fff; margin-bottom: 12px; font-size: 1.5rem; }
+        .clean-card-frame h2 { color: #fff; margin-bottom: 12px; font-size: 1.5rem; }
 
         .login-security-box {
             font-size: 0.88rem; color: var(--text-gray); line-height: 1.5; margin: 15px 0 22px 0;
@@ -92,7 +95,7 @@
         }
         .btn-google-large:hover { background: #f0f0f0; transform: translateY(-2px); }
 
-        /* Formulario Perfil */
+        /* Formulario Perfil / Mi Cuenta */
         .profile-form { display: flex; flex-direction: column; gap: 15px; text-align: left; margin-top: 15px; }
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         .form-group label { font-size: 0.85rem; color: var(--text-gray); font-weight: 500; }
@@ -203,7 +206,7 @@
     function startHeroTimer() { heroTimer = setInterval(nextHeroSlide, 5000); }
     function resetHeroTimer() { clearInterval(heroTimer); startHeroTimer(); }
 
-    /* Lógica de Estado de Usuario y Login */
+    /* Lógica de Estado de Usuario */
     function getUserData() {
         const saved = localStorage.getItem('forja3d_user');
         return saved ? JSON.parse(saved) : null;
@@ -220,14 +223,21 @@
             userIcon.className = "fa-solid fa-circle-user";
             userIcon.style.color = "var(--primary)";
             dropdown.innerHTML = `
-                <div style="border-bottom: 1px solid #333; padding-bottom: 10px;">
-                    <strong style="color:#fff; font-size:1rem;">${user.nombre} ${user.apellido}</strong>
-                    <p style="font-size:0.8rem; color:var(--text-gray); margin-top:2px;">${user.email}</p>
-                    ${user.telefono ? `<p style="font-size:0.78rem; color:var(--primary); margin-top:4px;"><i class="fa-solid fa-phone"></i> ${user.telefono}</p>` : ''}
+                <div style="border-bottom: 1px solid #333; padding-bottom: 8px; text-align: left;">
+                    <strong style="color:#fff; font-size:1.05rem; display:block;">¡Hola, ${user.nombre}!</strong>
+                    <span style="font-size: 0.82rem; color: var(--accent-green); display: flex; align-items: center; gap: 5px; margin-top: 4px;">
+                        <i class="fa-solid fa-star"></i> Puntos Forja: <strong>0 pts</strong>
+                    </span>
                 </div>
-                <p class="dropdown-sub" style="font-size: 0.8rem; color: var(--accent-green);">
-                    <i class="fa-solid fa-star"></i> Puntos Forja: <strong>0 pts</strong>
-                </p>
+                
+                <button class="dropdown-item-btn" onclick="navigateTo('/mi-cuenta')">
+                    <i class="fa-solid fa-user-gear" style="color: var(--primary);"></i> Mi Cuenta
+                </button>
+                
+                <button class="dropdown-item-btn" onclick="alert('Sección de Pedidos en desarrollo.')">
+                    <i class="fa-solid fa-box-archive" style="color: var(--primary);"></i> Mis Pedidos
+                </button>
+
                 <button class="btn-dropdown-action btn-dropdown-logout" onclick="logoutUser()">
                     <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
                 </button>
@@ -257,13 +267,11 @@
         }
     });
 
-    /* Flujo de Login en 2 Pasos */
+    /* Login & Perfil */
     function simulateGoogleAuth() {
-        // Paso 1: Ocultar el cuadro de Google e ingresar al formulario de perfil
         document.getElementById('step-google').classList.add('view-hidden');
         document.getElementById('step-profile').classList.remove('view-hidden');
 
-        // Autocompletar simulado desde Google
         document.getElementById('input-email').value = "usuario.demo@gmail.com";
         document.getElementById('input-nombre').value = "Santiago";
         document.getElementById('input-apellido').value = "";
@@ -288,11 +296,36 @@
         navigateTo('/');
     }
 
+    function updateAccountData(e) {
+        e.preventDefault();
+        const user = getUserData();
+        if (!user) return;
+
+        const nombre = document.getElementById('acc-nombre').value.trim();
+        const apellido = document.getElementById('acc-apellido').value.trim();
+        const telefono = document.getElementById('acc-telefono').value.trim();
+
+        if (!nombre || !apellido) {
+            alert('Por favor completá tu Nombre y Apellido.');
+            return;
+        }
+
+        user.nombre = nombre;
+        user.apellido = apellido;
+        user.telefono = telefono;
+
+        localStorage.setItem('forja3d_user', JSON.stringify(user));
+        renderUserStatus();
+        
+        const feedback = document.getElementById('acc-feedback');
+        feedback.style.display = 'block';
+        setTimeout(() => { feedback.style.display = 'none'; }, 3000);
+    }
+
     function logoutUser() {
         localStorage.removeItem('forja3d_user');
         renderUserStatus();
-        const dropdown = document.getElementById('userDropdown');
-        if (dropdown) dropdown.classList.remove('active');
+        navigateTo('/');
     }
 
     /* Navegación SPA */
@@ -306,25 +339,35 @@
     function handleRoute(path) {
         const viewHome = document.getElementById('view-home');
         const viewLogin = document.getElementById('view-login');
+        const viewAccount = document.getElementById('view-account');
+
+        // Ocultar todas las vistas por defecto
+        if (viewHome) viewHome.classList.add('view-hidden');
+        if (viewLogin) viewLogin.classList.add('view-hidden');
+        if (viewAccount) viewAccount.classList.add('view-hidden');
+
+        const user = getUserData();
 
         if (path === '/login') {
-            document.body.classList.add('mode-login');
-            if (viewHome) viewHome.classList.add('view-hidden');
+            document.body.classList.add('mode-clean');
+            if (user) { navigateTo('/'); return; }
             if (viewLogin) viewLogin.classList.remove('view-hidden');
-            
-            // Si ya está logueado y entra a /login, redirigir a Home
-            if (getUserData()) {
-                navigateTo('/');
-                return;
-            }
-
-            // Resetear la pantalla de login al Paso 1
             document.getElementById('step-google').classList.remove('view-hidden');
             document.getElementById('step-profile').classList.add('view-hidden');
             window.scrollTo(0, 0);
+        } else if (path === '/mi-cuenta') {
+            document.body.classList.add('mode-clean');
+            if (!user) { navigateTo('/login'); return; }
+            if (viewAccount) viewAccount.classList.remove('view-hidden');
+            
+            // Cargar datos actuales en los inputs
+            document.getElementById('acc-email').value = user.email || '';
+            document.getElementById('acc-nombre').value = user.nombre || '';
+            document.getElementById('acc-apellido').value = user.apellido || '';
+            document.getElementById('acc-telefono').value = user.telefono || '';
+            window.scrollTo(0, 0);
         } else {
-            document.body.classList.remove('mode-login');
-            if (viewLogin) viewLogin.classList.add('view-hidden');
+            document.body.classList.remove('mode-clean');
             if (viewHome) viewHome.classList.remove('view-hidden');
         }
     }
@@ -490,16 +533,16 @@
 
     <!-- VISTA DEDICADA /login -->
     <main id="view-login" class="view-hidden">
-        <div class="login-wrapper">
+        <div class="clean-wrapper">
             
-            <div class="login-brand-header" onclick="navigateTo('/')">
+            <div class="clean-brand-header" onclick="navigateTo('/')">
                 <div class="logo-large">
                     <i class="fa-solid fa-cube"></i> FORJA 3D
                 </div>
             </div>
 
             <!-- PASO 1: AUTENTICACIÓN CON GOOGLE -->
-            <div class="login-card-frame" id="step-google">
+            <div class="clean-card-frame" id="step-google">
                 <i class="fa-solid fa-shield-halved" style="font-size: 2.8rem; color: var(--primary); margin-bottom: 12px;"></i>
                 <h2>Iniciar Sesión en Forja 3D</h2>
                 
@@ -517,8 +560,8 @@
                 </a>
             </div>
 
-            <!-- PASO 2: COMPLETAR DATOS DEL PERFIL -->
-            <div class="login-card-frame view-hidden" id="step-profile">
+            <!-- PASO 2: COMPLETAR DATOS DEL PERFIL INICIAL -->
+            <div class="clean-card-frame view-hidden" id="step-profile">
                 <i class="fa-solid fa-id-card" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 10px;"></i>
                 <h2>Completá tu Perfil</h2>
                 <p style="font-size: 0.85rem; color: var(--text-gray); margin-bottom: 15px;">
@@ -550,6 +593,61 @@
                         <i class="fa-solid fa-check"></i> Guardar y Continuar
                     </button>
                 </form>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- VISTA DEDICADA /mi-cuenta (CONFIGURACIÓN Y EDICIÓN DE PERFIL) -->
+    <main id="view-account" class="view-hidden">
+        <div class="clean-wrapper">
+            
+            <div class="clean-brand-header" onclick="navigateTo('/')">
+                <div class="logo-large">
+                    <i class="fa-solid fa-cube"></i> FORJA 3D
+                </div>
+            </div>
+
+            <div class="clean-card-frame">
+                <i class="fa-solid fa-user-gear" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 10px;"></i>
+                <h2>Mi Cuenta</h2>
+                <p style="font-size: 0.85rem; color: var(--text-gray); margin-bottom: 15px;">
+                    Gestioná tus datos personales de contacto.
+                </p>
+
+                <form class="profile-form" onsubmit="updateAccountData(event)">
+                    <div class="form-group">
+                        <label>Correo Electrónico (Protegido por Google)</label>
+                        <input type="email" id="acc-email" disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nombre *</label>
+                        <input type="text" id="acc-nombre" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Apellido *</label>
+                        <input type="text" id="acc-apellido" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Teléfono / WhatsApp (Para Puntos y Envíos)</label>
+                        <input type="tel" id="acc-telefono" placeholder="Sin especificar">
+                    </div>
+
+                    <p id="acc-feedback" style="display: none; color: var(--accent-green); font-size: 0.85rem; text-align: center; font-weight: 500;">
+                        <i class="fa-solid fa-circle-check"></i> ¡Datos actualizados con éxito!
+                    </p>
+
+                    <button type="submit" class="btn-dropdown-action" style="margin-top: 10px; padding: 12px;">
+                        <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
+                    </button>
+                </form>
+
+                <a href="/" onclick="event.preventDefault(); navigateTo('/');" style="display: inline-block; margin-top: 22px; color: var(--text-gray); font-size: 0.85rem; text-decoration: none;">
+                    <i class="fa-solid fa-arrow-left"></i> Volver a la tienda
+                </a>
             </div>
 
         </div>
