@@ -167,6 +167,62 @@
         .error-msg-text { color: #ef4444; font-size: 0.78rem; font-weight: 600; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
     </style>
 </head>
+
+<!-- CONFIGURACIÓN DE FIREBASE (NUEVO) -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "TU_API_KEY",
+        authDomain: "TU_PROJECT.firebaseapp.com",
+        projectId: "TU_PROJECT_ID",
+        storageBucket: "TU_PROJECT.appspot.com",
+        messagingSenderId: "TU_SENDER_ID",
+        appId: "TU_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    window.firebaseAuth = auth;
+    window.firebaseDb = db;
+    window.googleProvider = provider;
+    window.signInWithPopup = signInWithPopup;
+    window.signOut = signOut;
+    window.doc = doc;
+    window.setDoc = setDoc;
+    window.getDoc = getDoc;
+    window.serverTimestamp = serverTimestamp;
+
+    // Escuchar cambios de estado en Firebase sin interrumpir el DOM local
+    onAuthStateChanged(auth, async (firebaseUser) => {
+        if (firebaseUser) {
+            const userRef = doc(db, "users", firebaseUser.uid);
+            const userSnap = await getDoc(userRef);
+
+            if (userSnap.exists()) {
+                const data = userSnap.data();
+                const userData = {
+                    uid: firebaseUser.uid,
+                    nombre: data.nombre || '',
+                    apellido: data.apellido || '',
+                    telefono: data.telefono || '',
+                    email: firebaseUser.email,
+                    puntos: data.puntos || 0
+                };
+                localStorage.setItem('forja3d_user', JSON.stringify(userData));
+            }
+        } else {
+            localStorage.removeItem('forja3d_user');
+        }
+        renderUserStatus();
+    });
+</script>
+
 <script>
     /* Lógica Carruseles */
     function moveCarousel(direction, carouselId) {
@@ -233,7 +289,7 @@
                 <div style="border-bottom: 1px solid #333; padding-bottom: 8px; text-align: left;">
                     <strong style="color:#fff; font-size:1.05rem; display:block;">¡Hola, ${user.nombre}!</strong>
                     <span style="font-size: 0.82rem; color: var(--accent-green); display: flex; align-items: center; gap: 5px; margin-top: 4px;">
-                        <i class="fa-solid fa-star"></i> Puntos Forja: <strong>0 pts</strong>
+                        <i class="fa-solid fa-star"></i> Puntos Forja: <strong>${user.puntos || 0} pts</strong>
                     </span>
                 </div>
                 
@@ -299,17 +355,44 @@
         parent.appendChild(errorDiv);
     }
 
-    /* Login & Perfil */
-    function simulateGoogleAuth() {
-        document.getElementById('step-google').classList.add('view-hidden');
-        document.getElementById('step-profile').classList.remove('view-hidden');
+    /* Login & Perfil con Google y Firestore */
+    async function simulateGoogleAuth() {
+        try {
+            const result = await window.signInWithPopup(window.firebaseAuth, window.googleProvider);
+            const user = result.user;
 
-        document.getElementById('input-email').value = "usuario.demo@gmail.com";
-        document.getElementById('input-nombre').value = "Santiago";
-        document.getElementById('input-apellido').value = "";
+            const userRef = window.doc(window.firebaseDb, "users", user.uid);
+            const userSnap = await window.getDoc(userRef);
+
+            if (userSnap.exists()) {
+                const data = userSnap.data();
+                const userData = {
+                    uid: user.uid,
+                    nombre: data.nombre,
+                    apellido: data.apellido,
+                    telefono: data.telefono || '',
+                    email: user.email,
+                    puntos: data.puntos || 0
+                };
+                localStorage.setItem('forja3d_user', JSON.stringify(userData));
+                renderUserStatus();
+                navigateTo('/');
+            } else {
+                document.getElementById('step-google').classList.add('view-hidden');
+                document.getElementById('step-profile').classList.remove('view-hidden');
+
+                const nameParts = (user.displayName || "").split(" ");
+                document.getElementById('input-email').value = user.email || '';
+                document.getElementById('input-nombre').value = nameParts[0] || '';
+                document.getElementById('input-apellido').value = nameParts.slice(1).join(" ") || '';
+            }
+        } catch (error) {
+            console.error("Error al autenticar con Google:", error);
+            alert("No se pudo iniciar sesión con Google. Intentá nuevamente.");
+        }
     }
 
-    function saveUserProfile(e) {
+    async function saveUserProfile(e) {
         e.preventDefault();
         const nombreInput = document.getElementById('input-nombre');
         const apellidoInput = document.getElementById('input-apellido');
@@ -333,16 +416,28 @@
 
         if (hasError) return;
 
+        const currentAuthUser = window.firebaseAuth.currentUser;
+        if (!currentAuthUser) return;
+
         const userData = {
+            uid: currentAuthUser.uid,
             nombre: nombreInput.value.trim(),
             apellido: apellidoInput.value.trim(),
             telefono: telefonoInput.value.trim(),
-            email: email
+            email: email,
+            puntos: 0,
+            updatedAt: window.serverTimestamp()
         };
 
-        localStorage.setItem('forja3d_user', JSON.stringify(userData));
-        renderUserStatus();
-        navigateTo('/');
+        try {
+            await window.setDoc(window.doc(window.firebaseDb, "users", currentAuthUser.uid), userData, { merge: true });
+            localStorage.setItem('forja3d_user', JSON.stringify(userData));
+            renderUserStatus();
+            navigateTo('/');
+        } catch (error) {
+            console.error("Error al guardar perfil:", error);
+            alert("Ocurrió un error al guardar tus datos.");
+        }
     }
 
     /* Modo Edición en /mi-cuenta */
@@ -376,7 +471,7 @@
         document.getElementById('acc-feedback').style.display = 'none';
     }
 
-    function updateAccountData(e) {
+    async function updateAccountData(e) {
         e.preventDefault();
         const user = getUserData();
         if (!user) return;
@@ -406,25 +501,45 @@
         user.apellido = apellidoInput.value.trim();
         user.telefono = telefonoInput.value.trim();
 
-        localStorage.setItem('forja3d_user', JSON.stringify(user));
-        renderUserStatus();
+        try {
+            const currentAuthUser = window.firebaseAuth.currentUser;
+            if (currentAuthUser) {
+                await window.setDoc(window.doc(window.firebaseDb, "users", currentAuthUser.uid), {
+                    nombre: user.nombre,
+                    apellido: user.apellido,
+                    telefono: user.telefono,
+                    updatedAt: window.serverTimestamp()
+                }, { merge: true });
+            }
 
-        nombreInput.setAttribute('disabled', 'true');
-        apellidoInput.setAttribute('disabled', 'true');
-        telefonoInput.setAttribute('disabled', 'true');
+            localStorage.setItem('forja3d_user', JSON.stringify(user));
+            renderUserStatus();
 
-        document.getElementById('btn-edit-account').classList.remove('view-hidden');
-        document.getElementById('account-edit-actions').classList.add('view-hidden');
+            nombreInput.setAttribute('disabled', 'true');
+            apellidoInput.setAttribute('disabled', 'true');
+            telefonoInput.setAttribute('disabled', 'true');
 
-        const feedback = document.getElementById('acc-feedback');
-        feedback.style.display = 'block';
-        setTimeout(() => { feedback.style.display = 'none'; }, 3000);
+            document.getElementById('btn-edit-account').classList.remove('view-hidden');
+            document.getElementById('account-edit-actions').classList.add('view-hidden');
+
+            const feedback = document.getElementById('acc-feedback');
+            feedback.style.display = 'block';
+            setTimeout(() => { feedback.style.display = 'none'; }, 3000);
+        } catch (error) {
+            console.error("Error al actualizar la cuenta:", error);
+            alert("No se pudo actualizar la información.");
+        }
     }
 
-    function logoutUser() {
-        localStorage.removeItem('forja3d_user');
-        renderUserStatus();
-        navigateTo('/');
+    async function logoutUser() {
+        try {
+            await window.signOut(window.firebaseAuth);
+            localStorage.removeItem('forja3d_user');
+            renderUserStatus();
+            navigateTo('/');
+        } catch (error) {
+            console.error("Error al cerrar sesión:", error);
+        }
     }
 
     /* Navegación SPA */
