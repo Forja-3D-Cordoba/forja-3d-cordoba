@@ -440,7 +440,7 @@
         const apellidoInput = document.getElementById('input-apellido');
         const telefonoInput = document.getElementById('input-telefono');
         const email = document.getElementById('input-email').value;
-
+        const roleToSave = existingData.role || (email === DUENO_EMAIL ? "dueno" : "cliente");
         let hasError = false;
 
         clearFieldError(nombreInput);
