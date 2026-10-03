@@ -465,6 +465,11 @@
         const userSnap = await window.getDoc(userRef);
         const existingData = userSnap.exists() ? userSnap.data() : {};
 
+        // Determinar rol: si ya tiene rol lo conserva, de lo contrario verifica el correo exactamente
+        const assignedRole = existingData.role 
+        ? existingData.role 
+        : (email === "san3d.ok@gmail.com" ? "dueno" : "cliente");
+
         const userData = {
             uid: currentAuthUser.uid,
             nombre: nombreInput.value.trim(),
