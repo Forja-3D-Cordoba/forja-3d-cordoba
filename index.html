@@ -172,7 +172,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
    const firebaseConfig = {
   apiKey: "AIzaSyBGqKkygGc4li3fH7ox7K6xTZIDrlviMRc",
@@ -188,6 +188,40 @@
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
+    // Único correo fijado para el rol de dueño
+    const DUENO_EMAIL = "san3d.ok@gmail.com";
+
+    async function checkAndCreateUser(user) {
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        // Si es tu correo asigna 'dueno', para todos los demás asigna 'cliente' por defecto
+        const initialRole = user.email === DUENO_EMAIL ? "dueno" : "cliente";
+
+        await setDoc(userRef, {
+          uid: user.uid,
+          email: user.email,
+          nombre: "",      // Completado manualmente en el formulario
+          apellido: "",    // Completado manualmente en el formulario
+          telefono: "",    // Completado manualmente en el formulario
+          puntos: 0,
+          misPedidos: [],
+          role: initialRole,
+          createdAt: new Date().toISOString()
+        });
+
+        console.log(`Usuario registrado con rol: ${initialRole}`);
+      }
+    }
+
+    // Función que ejecutará tu panel de dueño para nombrar a un administrador
+    async function promoverAAdmin(targetUid) {
+      const userRef = doc(db, "users", targetUid);
+      await updateDoc(userRef, { role: "admin" });
+      console.log("Rol actualizado a Admin");
+    }
+
     window.firebaseAuth = auth;
     window.firebaseDb = db;
     window.googleProvider = provider;
@@ -196,11 +230,15 @@
     window.doc = doc;
     window.setDoc = setDoc;
     window.getDoc = getDoc;
+    window.updateDoc = updateDoc;
     window.serverTimestamp = serverTimestamp;
+    window.checkAndCreateUser = checkAndCreateUser;
+    window.promoverAAdmin = promoverAAdmin;
 
     // Escuchar cambios de estado en Firebase sin interrumpir el DOM local
     onAuthStateChanged(auth, async (firebaseUser) => {
         if (firebaseUser) {
+            await checkAndCreateUser(firebaseUser);
             const userRef = doc(db, "users", firebaseUser.uid);
             const userSnap = await getDoc(userRef);
 
@@ -212,7 +250,8 @@
                     apellido: data.apellido || '',
                     telefono: data.telefono || '',
                     email: firebaseUser.email,
-                    puntos: data.puntos || 0
+                    puntos: data.puntos || 0,
+                    role: data.role || 'cliente'
                 };
                 localStorage.setItem('forja3d_user', JSON.stringify(userData));
             }
@@ -361,10 +400,12 @@
             const result = await window.signInWithPopup(window.firebaseAuth, window.googleProvider);
             const user = result.user;
 
+            await window.checkAndCreateUser(user);
+
             const userRef = window.doc(window.firebaseDb, "users", user.uid);
             const userSnap = await window.getDoc(userRef);
 
-            if (userSnap.exists()) {
+            if (userSnap.exists() && userSnap.data().nombre) {
                 const data = userSnap.data();
                 const userData = {
                     uid: user.uid,
@@ -372,7 +413,8 @@
                     apellido: data.apellido,
                     telefono: data.telefono || '',
                     email: user.email,
-                    puntos: data.puntos || 0
+                    puntos: data.puntos || 0,
+                    role: data.role || 'cliente'
                 };
                 localStorage.setItem('forja3d_user', JSON.stringify(userData));
                 renderUserStatus();
@@ -419,18 +461,24 @@
         const currentAuthUser = window.firebaseAuth.currentUser;
         if (!currentAuthUser) return;
 
+        const userRef = window.doc(window.firebaseDb, "users", currentAuthUser.uid);
+        const userSnap = await window.getDoc(userRef);
+        const existingData = userSnap.exists() ? userSnap.data() : {};
+
         const userData = {
             uid: currentAuthUser.uid,
             nombre: nombreInput.value.trim(),
             apellido: apellidoInput.value.trim(),
             telefono: telefonoInput.value.trim(),
             email: email,
-            puntos: 0,
+            puntos: existingData.puntos || 0,
+            misPedidos: existingData.misPedidos || [],
+            role: existingData.role || (email === "san3d.ok@gmail.com" ? "dueno" : "cliente"),
             updatedAt: window.serverTimestamp()
         };
 
         try {
-            await window.setDoc(window.doc(window.firebaseDb, "users", currentAuthUser.uid), userData, { merge: true });
+            await window.setDoc(userRef, userData, { merge: true });
             localStorage.setItem('forja3d_user', JSON.stringify(userData));
             renderUserStatus();
             navigateTo('/');
