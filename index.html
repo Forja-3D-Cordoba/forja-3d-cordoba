@@ -56,7 +56,7 @@
         /* Control de Visibilidad SPA */
         .view-hidden { display: none !important; }
 
-        /* MODO PANTALLA LIMPIAS (/login y /mi-cuenta) */
+        /* MODO PANTALLA LIMPIAS (/login, /mi-cuenta y /panel-control) */
         body.mode-clean header,
         body.mode-clean nav,
         body.mode-clean .whatsapp-btn,
@@ -75,6 +75,9 @@
             background: #181818; border: 1px solid var(--primary); border-radius: 14px;
             padding: 40px 32px; max-width: 460px; width: 100%; text-align: center;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        }
+        .clean-card-frame.wide-frame {
+            max-width: 800px;
         }
         .clean-card-frame h2 { color: #fff; margin-bottom: 12px; font-size: 1.5rem; }
 
@@ -319,6 +322,13 @@
         if (user) {
             userIcon.className = "fa-solid fa-circle-user";
             userIcon.style.color = "var(--primary)";
+
+            const adminButtonHtml = (user.role === 'dueno' || user.role === 'admin') ? `
+                <button class="dropdown-item-btn" onclick="navigateTo('/panel-control')">
+                    <i class="fa-solid fa-sliders" style="color: var(--primary);"></i> Panel de Control
+                </button>
+            ` : '';
+
             dropdown.innerHTML = `
                 <div style="border-bottom: 1px solid #333; padding-bottom: 8px; text-align: left;">
                     <strong style="color:#fff; font-size:1.05rem; display:block;">¡Hola, ${user.nombre}!</strong>
@@ -327,6 +337,8 @@
                     </span>
                 </div>
                 
+                ${adminButtonHtml}
+
                 <button class="dropdown-item-btn" onclick="navigateTo('/mi-cuenta')">
                     <i class="fa-solid fa-user-gear" style="color: var(--primary);"></i> Mi Cuenta
                 </button>
@@ -602,10 +614,12 @@
         const viewHome = document.getElementById('view-home');
         const viewLogin = document.getElementById('view-login');
         const viewAccount = document.getElementById('view-account');
+        const viewControlPanel = document.getElementById('view-control-panel');
 
         if (viewHome) viewHome.classList.add('view-hidden');
         if (viewLogin) viewLogin.classList.add('view-hidden');
         if (viewAccount) viewAccount.classList.add('view-hidden');
+        if (viewControlPanel) viewControlPanel.classList.add('view-hidden');
 
         const user = getUserData();
 
@@ -637,6 +651,14 @@
             clearFieldError(document.getElementById('acc-apellido'));
 
             window.scrollTo(0, 0);
+        } else if (path === '/panel-control') {
+            document.body.classList.add('mode-clean');
+            if (!user || (user.role !== 'dueno' && user.role !== 'admin')) {
+                navigateTo('/');
+                return;
+            }
+            if (viewControlPanel) viewControlPanel.classList.remove('view-hidden');
+            window.scrollTo(0, 0);
         } else {
             document.body.classList.remove('mode-clean');
             if (viewHome) viewHome.classList.remove('view-hidden');
@@ -663,7 +685,7 @@
         <div class="logo" onclick="navigateTo('/')"><i class="fa-solid fa-cube"></i> Forja 3D</div>
         
         <div class="search-box">
-            <input type="text" placeholder="Buscá repuestos técnicos, archivos STL, filamentos...">
+            <input type="text" placeholder="Buscá Productos...">
             <button><i class="fa-solid fa-magnifying-glass"></i></button>
         </div>
         
@@ -924,12 +946,43 @@
         </div>
     </main>
 
+    <!-- VISTA DEDICADA /panel-control (ADMIN / DUEÑO) -->
+    <main id="view-control-panel" class="view-hidden">
+        <div class="clean-wrapper">
+            
+            <div class="clean-brand-header" onclick="navigateTo('/')">
+                <div class="logo-large">
+                    <i class="fa-solid fa-cube"></i> FORJA 3D
+                </div>
+            </div>
+
+            <div class="clean-card-frame wide-frame">
+                <i class="fa-solid fa-sliders" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 10px;"></i>
+                <h2>Panel de Control</h2>
+                <p style="font-size: 0.85rem; color: var(--text-gray); margin-bottom: 25px;">
+                    Administración general del catálogo, stock y pedidos.
+                </p>
+
+                <!-- Área reservada para el formulario de carga e inventario -->
+                <div style="background: #101010; padding: 30px; border-radius: 8px; border: 1px dashed var(--primary); text-align: center;">
+                    <i class="fa-solid fa-boxes-packing" style="font-size: 2rem; color: var(--primary); margin-bottom: 10px;"></i>
+                    <p style="color: var(--text-light); font-weight: 500;">Espacio listo para integrar el formulario de carga y gestión de productos.</p>
+                </div>
+
+                <a href="/" onclick="event.preventDefault(); navigateTo('/');" style="display: inline-block; margin-top: 25px; color: var(--text-gray); font-size: 0.85rem; text-decoration: none;">
+                    <i class="fa-solid fa-arrow-left"></i> Volver a la tienda
+                </a>
+            </div>
+
+        </div>
+    </main>
+
     <!-- Footer Tienda -->
     <footer>
         <div class="footer-content">
             <div>
                 <h4 style="color: #fff; margin-bottom: 10px;">Forja 3D Córdoba</h4>
-                <p>Soluciones de fabricación aditiva y prototipado rápido.</p>
+                <p>Impresiones 3D de alta calidad.</p>
             </div>
             <div>
                 <h4 style="color: #fff; margin-bottom: 10px;">Soporte Técnico</h4>
