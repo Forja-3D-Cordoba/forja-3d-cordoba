@@ -163,6 +163,235 @@
         .input-error { border: 2px solid #ef4444 !important; background-color: rgba(239, 68, 68, 0.08) !important; animation: shakeError 0.4s ease-in-out; }
         /* Mensaje explicativo debajo del campo */
         .error-msg-text { color: #ef4444; font-size: 0.78rem; font-weight: 600; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+        
+     /* =========================================================
+     ESTILOS NUEVOS: PANEL DE CONTROL CON SIDEBAR Y MODALES
+     ========================================================= */
+
+      /* Layout general del Panel de Control */
+     .admin-layout {
+     display: flex;
+     min-height: 100vh;
+     background: var(--bg-dark);
+     width: 100%;
+     } 
+
+     /* Sidebar (Columna Izquierda) */
+     .admin-sidebar {
+     width: 260px;
+     background: #181818;
+     border-right: 1px solid var(--primary);
+     display: flex;
+     flex-direction: column;
+     justify-content: space-between;
+     padding: 20px;
+     box-sizing: border-box;
+     }
+
+     .admin-sidebar-header {
+     display: flex;
+     align-items: center;
+     gap: 10px;
+     padding-bottom: 20px;
+     border-bottom: 1px solid #333;
+     margin-bottom: 20px;
+     }
+
+     .admin-sidebar-brand {
+     font-size: 1.2rem;
+     font-weight: bold;
+     color: var(--primary);
+     text-transform: uppercase;
+     display: flex;
+     align-items: center;
+     gap: 8px;
+     }
+
+     .admin-badge {
+     background: rgba(0, 188, 212, 0.15);
+     color: var(--primary);
+     font-size: 0.72rem;
+     padding: 3px 8px;
+     border-radius: 4px;
+     border: 1px solid var(--primary);
+     font-weight: 600;
+     }
+
+     .admin-nav {
+     display: flex;
+     flex-direction: column;
+     gap: 8px;
+     }
+
+     .admin-nav-btn {
+     background: transparent;
+     color: var(--text-light);
+     border: 1px solid transparent;
+     padding: 12px 14px;
+     border-radius: 8px;
+     font-size: 0.95rem;
+     font-weight: 500;
+     cursor: pointer;
+     text-align: left;
+     display: flex;
+     align-items: center;
+     gap: 12px;
+     transition: all 0.2s ease;
+     }
+
+     .admin-nav-btn:hover {
+     background: #242424;
+     color: #fff;
+     }
+
+     .admin-nav-btn.active {
+     background: #242424;
+     border-color: var(--primary);
+     color: var(--primary);
+     }
+
+     .admin-sidebar-footer {
+     padding-top: 20px;
+     border-top: 1px solid #333;
+     }
+
+     /* Contenido Principal a la Derecha */
+     .admin-content {
+     flex: 1;
+     padding: 30px;
+     overflow-y: auto;
+     }
+
+     .admin-section-header {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     margin-bottom: 25px;
+     padding-bottom: 15px;
+     border-bottom: 1px solid #2a2a2a;
+     }
+
+     .admin-section-header h2 {
+     font-size: 1.6rem;
+     color: #fff;
+     display: flex;
+     align-items: center;
+     gap: 10px;
+     }
+
+     /* Tablas / Tarjetas de Admin */
+     .admin-card-box {
+     background: #181818;
+     border: 1px solid #333;
+     border-radius: 10px;
+     padding: 20px;
+     }
+
+     /* Modales / Ventanas Flotantes */
+     .admin-modal-overlay {
+     position: fixed;
+     top: 0;
+     left: 0;
+     width: 100vw;
+     height: 100vh;
+     background: rgba(0, 0, 0, 0.75);
+     backdrop-filter: blur(4px);
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     z-index: 2000;
+     }
+
+     .admin-modal-card {
+     background: #181818;
+     border: 1px solid var(--primary);
+     border-radius: 12px;
+     width: 100%;
+     max-width: 550px;
+     max-height: 90vh;
+     overflow-y: auto;
+     padding: 25px;
+     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+     }
+
+     .admin-modal-header {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     border-bottom: 1px solid #333;
+     padding-bottom: 12px;
+     margin-bottom: 20px;
+     }
+
+     .admin-modal-header h3 {
+     color: #fff;
+     font-size: 1.25rem;
+     display: flex;
+     align-items: center;
+     gap: 8px;
+     }
+
+     .admin-modal-close {
+     background: transparent;
+     border: none;
+     color: var(--text-gray);
+     font-size: 1.3rem;
+     cursor: pointer;
+     }
+
+     .admin-modal-close:hover {
+     color: #ff5252;
+     }
+
+     .admin-dynamic-row {
+     display: flex;
+     gap: 10px;
+     align-items: center;
+     margin-bottom: 10px;
+     }
+
+     .admin-btn-remove {
+     background: #2a2a2a;
+     color: #ff5252;
+     border: 1px solid #333;
+     border-radius: 6px;
+     width: 38px;
+     height: 38px;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     cursor: pointer;
+     flex-shrink: 0;
+     }
+
+     .admin-btn-remove:hover {
+     background: #3d1c1c;
+     border-color: #ff5252;
+     }
+
+     .admin-btn-secondary {
+     background: #242424;
+     color: var(--text-light);
+     border: 1px solid #444;
+     padding: 8px 14px;
+     border-radius: 6px;
+     font-size: 0.85rem;
+     cursor: pointer;
+     display: inline-flex;
+     align-items: center;
+     gap: 6px;
+     margin-top: 5px;
+     }
+
+     .admin-btn-secondary:hover:not(:disabled) {
+     border-color: var(--primary);
+     color: var(--primary);
+     }
+
+     .admin-btn-secondary:disabled {
+     opacity: 0.5;
+     cursor: not-allowed;
+     }
     </style>
 </head>
 
@@ -677,6 +906,144 @@
         renderUserStatus();
         handleRoute(window.location.pathname);
     });
+
+    /* =========================================================
+   LÓGICA DEL PANEL DE CONTROL Y MODAL DE PRODUCTOS
+   ========================================================= */
+
+    // Almacenamiento local temporal para colores globales
+    let globalColors = ['Negro', 'Blanco', 'Rojo', 'Azul', 'Celeste', 'Gris'];
+
+    function switchAdminTab(tabName) {
+    document.getElementById('admin-tab-productos').classList.add('view-hidden');
+    document.getElementById('admin-tab-colores').classList.add('view-hidden');
+    
+    document.getElementById('btn-tab-productos').classList.remove('active');
+    document.getElementById('btn-tab-colores').classList.remove('active');
+
+    if (tabName === 'productos') {
+        document.getElementById('admin-tab-productos').classList.remove('view-hidden');
+        document.getElementById('btn-tab-productos').classList.add('active');
+    } else if (tabName === 'colores') {
+        document.getElementById('admin-tab-colores').classList.remove('view-hidden');
+        document.getElementById('btn-tab-colores').classList.add('active');
+        renderGlobalColorsList();
+    }
+}
+
+// Renderizar la lista global de colores disponibles
+function renderGlobalColorsList() {
+    const container = document.getElementById('global-colors-list');
+    if (!container) return;
+
+    if (globalColors.length === 0) {
+        container.innerHTML = `<span style="color: var(--text-gray); font-size: 0.85rem;">No hay colores registrados.</span>`;
+        return;
+    }
+
+    container.innerHTML = globalColors.map((color, index) => `
+        <div style="background: #242424; border: 1px solid #333; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-circle" style="color: var(--primary); font-size: 0.6rem;"></i>
+            <span>${color}</span>
+            <i class="fa-solid fa-xmark" style="cursor: pointer; color: #ff5252; margin-left: 4px;" onclick="removeGlobalColor(${index})"></i>
+        </div>
+    `).join('');
+}
+
+function addGlobalColor() {
+    const input = document.getElementById('input-new-color');
+    const value = input.value.trim();
+    if (value && !globalColors.includes(value)) {
+        globalColors.push(value);
+        input.value = '';
+        renderGlobalColorsList();
+    }
+}
+
+function removeGlobalColor(index) {
+    globalColors.splice(index, 1);
+    renderGlobalColorsList();
+}
+
+// Modal Agregar Producto
+function openAddProductModal() {
+    document.getElementById('modal-add-product').classList.remove('view-hidden');
+    document.getElementById('product-colors-container').innerHTML = '';
+    document.getElementById('product-textfields-container').innerHTML = '';
+    checkColorButtonLimit();
+}
+
+function closeAddProductModal() {
+    document.getElementById('modal-add-product').classList.add('view-hidden');
+}
+
+// Agregar Desplegable de Opción de Color (MÁXIMO 4)
+function addProductColorSelect() {
+    const container = document.getElementById('product-colors-container');
+    const currentSelects = container.querySelectorAll('.admin-dynamic-row');
+
+    if (currentSelects.length >= 4) return;
+
+    const optionsHtml = globalColors.length > 0 
+        ? globalColors.map(c => `<option value="${c}">${c}</option>`).join('')
+        : `<option value="">Sin colores globales definidos</option>`;
+
+    const row = document.createElement('div');
+    row.className = 'admin-dynamic-row';
+    row.innerHTML = `
+        <select class="form-group" style="flex: 1; background: #242424; border: 1px solid #333; padding: 10px; border-radius: 6px; color: #fff; outline: none;">
+            ${optionsHtml}
+        </select>
+        <button type="button" class="admin-btn-remove" onclick="removeDynamicRow(this)"><i class="fa-solid fa-trash-can"></i></button>
+    `;
+
+    container.appendChild(row);
+    checkColorButtonLimit();
+}
+
+// Agregar Campo de Texto Personalizado
+function addProductTextFieldInput() {
+    const container = document.getElementById('product-textfields-container');
+
+    const row = document.createElement('div');
+    row.className = 'admin-dynamic-row';
+    row.innerHTML = `
+        <input type="text" placeholder="Nombre de la etiqueta (Ej: Nombre a Grabar)" style="flex: 1; background: #242424; border: 1px solid #333; padding: 10px; border-radius: 6px; color: #fff; outline: none;">
+        <button type="button" class="admin-btn-remove" onclick="removeDynamicRow(this)"><i class="fa-solid fa-trash-can"></i></button>
+    `;
+
+    container.appendChild(row);
+}
+
+function removeDynamicRow(btn) {
+    btn.parentElement.remove();
+    checkColorButtonLimit();
+}
+
+function checkColorButtonLimit() {
+    const container = document.getElementById('product-colors-container');
+    const currentSelects = container.querySelectorAll('.admin-dynamic-row');
+    const btnAddColor = document.getElementById('btn-add-color-opt');
+    
+    if (btnAddColor) {
+        btnAddColor.disabled = (currentSelects.length >= 4);
+    }
+}
+
+function saveProduct(e) {
+    e.preventDefault();
+    const titulo = document.getElementById('prod-titulo');
+    const descripcion = document.getElementById('prod-descripcion');
+    const precio = document.getElementById('prod-precio');
+
+    if (!titulo.value.trim() || !descripcion.value.trim() || !precio.value.trim()) {
+        alert('Por favor completa todos los campos requeridos (*).');
+        return;
+    }
+
+    alert('¡Producto creado con éxito!');
+    closeAddProductModal();
+}
 </script>
 <body>
 
@@ -946,36 +1313,145 @@
         </div>
     </main>
 
-    <!-- VISTA DEDICADA /panel-control (ADMIN / DUEÑO) -->
+     <!-- VISTA DEDICADA /panel-control (ADMIN / DUEÑO) -->
     <main id="view-control-panel" class="view-hidden">
-        <div class="clean-wrapper">
+        <div class="admin-layout">
             
-            <div class="clean-brand-header" onclick="navigateTo('/')">
-                <div class="logo-large">
-                    <i class="fa-solid fa-cube"></i> FORJA 3D
+            <!-- Sidebar / Columna Izquierda -->
+            <aside class="admin-sidebar">
+                <div>
+                    <div class="admin-sidebar-header">
+                        <div class="admin-sidebar-brand" onclick="navigateTo('/')" style="cursor: pointer;">
+                            <i class="fa-solid fa-cube"></i> FORJA 3D
+                        </div>
+                        <span class="admin-badge">Panel</span>
+                    </div>
+
+                    <nav class="admin-nav">
+                        <button class="admin-nav-btn active" id="btn-tab-productos" onclick="switchAdminTab('productos')">
+                            <i class="fa-solid fa-boxes-stacked" style="color: var(--primary);"></i> Productos
+                        </button>
+                        <button class="admin-nav-btn" id="btn-tab-colores" onclick="switchAdminTab('colores')">
+                            <i class="fa-solid fa-palette" style="color: var(--primary);"></i> Gestión de Colores
+                        </button>
+                    </nav>
                 </div>
-            </div>
 
-            <div class="clean-card-frame wide-frame">
-                <i class="fa-solid fa-sliders" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 10px;"></i>
-                <h2>Panel de Control</h2>
-                <p style="font-size: 0.85rem; color: var(--text-gray); margin-bottom: 25px;">
-                    Administración general del catálogo, stock y pedidos.
-                </p>
+                <div class="admin-sidebar-footer">
+                    <a href="/" onclick="event.preventDefault(); navigateTo('/');" style="color: var(--text-gray); font-size: 0.88rem; text-decoration: none; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-arrow-left"></i> Volver a la tienda
+                    </a>
+                </div>
+            </aside>
 
-                <!-- Área reservada para el formulario de carga e inventario -->
-                <div style="background: #101010; padding: 30px; border-radius: 8px; border: 1px dashed var(--primary); text-align: center;">
-                    <i class="fa-solid fa-boxes-packing" style="font-size: 2rem; color: var(--primary); margin-bottom: 10px;"></i>
-                    <p style="color: var(--text-light); font-weight: 500;">Espacio listo para integrar el formulario de carga y gestión de productos.</p>
+            <!-- Sección de Contenido Principal -->
+            <section class="admin-content">
+                
+                <!-- TAB 1: PRODUCTOS -->
+                <div id="admin-tab-productos">
+                    <div class="admin-section-header">
+                        <h2><i class="fa-solid fa-boxes-stacked" style="color: var(--primary);"></i> Productos</h2>
+                        <button class="btn-dropdown-action" style="width: auto; padding: 10px 18px;" onclick="openAddProductModal()">
+                            <i class="fa-solid fa-plus"></i> Agregar Producto
+                        </button>
+                    </div>
+
+                    <div class="admin-card-box" id="admin-product-list">
+                        <p style="color: var(--text-gray); text-align: center; padding: 20px 0;">
+                            <i class="fa-solid fa-box-open fa-2x" style="margin-bottom: 10px; display: block;"></i>
+                            Aún no has agregado ningún producto.
+                        </p>
+                    </div>
                 </div>
 
-                <a href="/" onclick="event.preventDefault(); navigateTo('/');" style="display: inline-block; margin-top: 25px; color: var(--text-gray); font-size: 0.85rem; text-decoration: none;">
-                    <i class="fa-solid fa-arrow-left"></i> Volver a la tienda
-                </a>
-            </div>
+                <!-- TAB 2: GESTIÓN GLOBAL DE COLORES -->
+                <div id="admin-tab-colores" class="view-hidden">
+                    <div class="admin-section-header">
+                        <h2><i class="fa-solid fa-palette" style="color: var(--primary);"></i> Gestión de Colores Disponibles</h2>
+                    </div>
 
+                    <div class="admin-card-box">
+                        <p style="font-size: 0.9rem; color: var(--text-gray); margin-bottom: 15px;">
+                            Agregá los colores globales disponibles en tu taller. Estos colores aparecerán en los desplegables al crear/editar un producto.
+                        </p>
+
+                        <div style="display: flex; gap: 10px; margin-bottom: 20px; max-width: 450px;">
+                            <input type="text" id="input-new-color" placeholder="Ej: Rojo Negro, Blanco PLA, Celeste..." style="background: #242424; border: 1px solid #333; padding: 10px 14px; border-radius: 6px; color: #fff; flex: 1; outline: none;">
+                            <button type="button" class="btn-dropdown-action" style="width: auto; padding: 10px 16px;" onclick="addGlobalColor()">
+                                <i class="fa-solid fa-plus"></i> Guardar Color
+                            </button>
+                        </div>
+
+                        <div id="global-colors-list" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                            <!-- La lista de colores se renderiza con JS -->
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+
+        <!-- MODAL FLOTANTE: AGREGAR PRODUCTO -->
+        <div class="admin-modal-overlay view-hidden" id="modal-add-product">
+            <div class="admin-modal-card">
+                <div class="admin-modal-header">
+                    <h3><i class="fa-solid fa-box-archive" style="color: var(--primary);"></i> Agregar Nuevo Producto</h3>
+                    <button class="admin-modal-close" onclick="closeAddProductModal()"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+
+                <form onsubmit="saveProduct(event)" class="profile-form" novalidate>
+                    <div class="form-group">
+                        <label>Título del Producto *</label>
+                        <input type="text" id="prod-titulo" placeholder="Ej: Soporte Joystick PS5">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Descripción *</label>
+                        <input type="text" id="prod-descripcion" placeholder="Ej: Impreso en PLA reforzado">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Precio ($) *</label>
+                        <input type="number" id="prod-precio" placeholder="Ej: 3800">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Categoría *</label>
+                        <input type="text" id="prod-categoria" placeholder="Ej: Accesorios Gamer, Repuestos...">
+                    </div>
+
+                    <!-- SECCIÓN DINÁMICA: SELECCIÓN DE COLORES (MÁX 4) -->
+                    <div style="border-top: 1px solid #333; padding-top: 15px; margin-top: 10px;">
+                        <label style="font-size: 0.88rem; color: #fff; font-weight: 600;">Opciones de Color para el Cliente (Máx. 4)</label>
+                        <div id="product-colors-container" style="margin-top: 10px;"></div>
+                        <button type="button" id="btn-add-color-opt" class="admin-btn-secondary" onclick="addProductColorSelect()">
+                            <i class="fa-solid fa-plus"></i> Agregar Opción de Color
+                        </button>
+                    </div>
+
+                    <!-- SECCIÓN DINÁMICA: CAMPOS DE TEXTO PERSONALIZADOS -->
+                    <div style="border-top: 1px solid #333; padding-top: 15px; margin-top: 10px;">
+                        <label style="font-size: 0.88rem; color: #fff; font-weight: 600;">Campos de Texto Personalizados</label>
+                        <p style="font-size: 0.78rem; color: var(--text-gray);">Ejemplo: "Nombre a grabar", "Medida especial"</p>
+                        <div id="product-textfields-container" style="margin-top: 10px;"></div>
+                        <button type="button" class="admin-btn-secondary" onclick="addProductTextFieldInput()">
+                            <i class="fa-solid fa-plus"></i> Agregar Campo de Texto
+                        </button>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button type="button" class="dropdown-item-btn" style="text-align: center; justify-content: center;" onclick="closeAddProductModal()">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn-dropdown-action" style="padding: 12px;">
+                            <i class="fa-solid fa-floppy-disk"></i> Guardar Producto
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </main>
+    
 
     <!-- Footer Tienda -->
     <footer>
