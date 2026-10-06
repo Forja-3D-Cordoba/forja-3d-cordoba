@@ -392,6 +392,46 @@
      opacity: 0.5;
      cursor: not-allowed;
      }
+
+     /* Estilos Previsualización de Imágenes */
+     .img-preview-container {
+     display: flex;
+     flex-wrap: wrap;
+     gap: 10px;
+     margin-top: 10px;
+     }
+
+     .img-preview-item {
+     position: relative;
+     width: 75px;
+     height: 75px;
+     border-radius: 6px;
+     overflow: hidden;
+     border: 1px solid var(--primary);
+     }
+
+     .img-preview-item img {
+     width: 100%;
+     height: 100%;
+     object-fit: cover;
+     }
+
+     .img-preview-item .remove-img-btn {
+     position: absolute;
+     top: 3px;
+     right: 3px;
+     background: rgba(0, 0, 0, 0.7);
+     color: #ff5252;
+     border: none;
+     border-radius: 50%;
+     width: 20px;
+     height: 20px;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     font-size: 0.7rem;
+     cursor: pointer;
+     }
     </style>
 </head>
 
@@ -399,7 +439,8 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
    const firebaseConfig = {
   apiKey: "AIzaSyBGqKkygGc4li3fH7ox7K6xTZIDrlviMRc",
@@ -413,6 +454,7 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+    const storage = getStorage(app);
     const provider = new GoogleAuthProvider();
 
     // Único correo fijado para el rol de dueño
@@ -451,6 +493,7 @@
 
     window.firebaseAuth = auth;
     window.firebaseDb = db;
+    window.firebaseStorage = storage;
     window.googleProvider = provider;
     window.signInWithPopup = signInWithPopup;
     window.signOut = signOut;
@@ -458,6 +501,11 @@
     window.setDoc = setDoc;
     window.getDoc = getDoc;
     window.updateDoc = updateDoc;
+    window.collection = collection;
+    window.addDoc = addDoc;
+    window.ref = ref;
+    window.uploadBytes = uploadBytes;
+    window.getDownloadURL = getDownloadURL;
     window.serverTimestamp = serverTimestamp;
     window.checkAndCreateUser = checkAndCreateUser;
     window.promoverAAdmin = promoverAAdmin;
@@ -913,6 +961,7 @@
 
     // Almacenamiento local temporal para colores globales
     let globalColors = ['Negro', 'Blanco', 'Rojo', 'Azul', 'Celeste', 'Gris'];
+    let selectedFiles = [];
 
     function switchAdminTab(tabName) {
     document.getElementById('admin-tab-productos').classList.add('view-hidden');
@@ -970,11 +1019,47 @@ function openAddProductModal() {
     document.getElementById('modal-add-product').classList.remove('view-hidden');
     document.getElementById('product-colors-container').innerHTML = '';
     document.getElementById('product-textfields-container').innerHTML = '';
+    document.getElementById('product-images-preview').innerHTML = '';
+    document.getElementById('prod-imagenes').value = '';
+    selectedFiles = [];
     checkColorButtonLimit();
 }
 
 function closeAddProductModal() {
     document.getElementById('modal-add-product').classList.add('view-hidden');
+}
+
+// Previsualización y gestión local de imágenes cargadas
+function handleImagePreview(e) {
+    const files = Array.from(e.target.files);
+    selectedFiles = selectedFiles.concat(files);
+    renderImagePreviews();
+}
+
+function renderImagePreviews() {
+    const container = document.getElementById('product-images-preview');
+    container.innerHTML = '';
+
+    selectedFiles.forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const previewItem = document.createElement('div');
+            previewItem.className = 'img-preview-item';
+            previewItem.innerHTML = `
+                <img src="${event.target.result}" alt="Preview">
+                <button type="button" class="remove-img-btn" onclick="removePreviewImage(${index})">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            `;
+            container.appendChild(previewItem);
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+function removePreviewImage(index) {
+    selectedFiles.splice(index, 1);
+    renderImagePreviews();
 }
 
 // Agregar Desplegable de Opción de Color (MÁXIMO 4)
@@ -1030,19 +1115,68 @@ function checkColorButtonLimit() {
     }
 }
 
-function saveProduct(e) {
+async function saveProduct(e) {
     e.preventDefault();
     const titulo = document.getElementById('prod-titulo');
     const descripcion = document.getElementById('prod-descripcion');
     const precio = document.getElementById('prod-precio');
+    const categoria = document.getElementById('prod-categoria');
+    const btnSave = document.getElementById('btn-submit-product');
 
     if (!titulo.value.trim() || !descripcion.value.trim() || !precio.value.trim()) {
         alert('Por favor completa todos los campos requeridos (*).');
         return;
     }
 
-    alert('¡Producto creado con éxito!');
-    closeAddProductModal();
+    try {
+        if (btnSave) {
+            btnSave.disabled = true;
+            btnSave.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Guardando...`;
+        }
+
+        // Subir imágenes a Firebase Storage
+        const imageUrls = [];
+        for (const file of selectedFiles) {
+            const storagePath = `productos/${Date.now()}_${file.name}`;
+            const storageRef = window.ref(window.firebaseStorage, storagePath);
+            await window.uploadBytes(storageRef, file);
+            const downloadURL = await window.getDownloadURL(storageRef);
+            imageUrls.push(downloadURL);
+        }
+
+        // Recopilar colores configurados
+        const colorSelects = document.querySelectorAll('#product-colors-container select');
+        const colores = Array.from(colorSelects).map(select => select.value).filter(val => val !== "");
+
+        // Recopilar campos de texto personalizados
+        const textInputs = document.querySelectorAll('#product-textfields-container input');
+        const camposPersonalizados = Array.from(textInputs).map(input => input.value.trim()).filter(val => val !== "");
+
+        // Guardar objeto completo del producto en Firestore
+        const productData = {
+            titulo: titulo.value.trim(),
+            descripcion: descripcion.value.trim(),
+            precio: parseFloat(precio.value),
+            categoria: categoria.value.trim(),
+            imagenes: imageUrls,
+            coloresDisponibles: colores,
+            camposTextoPersonalizados: camposPersonalizados,
+            createdAt: window.serverTimestamp()
+        };
+
+        await window.addDoc(window.collection(window.firebaseDb, "productos"), productData);
+
+        alert('¡Producto y sus imágenes guardados con éxito!');
+        closeAddProductModal();
+    } catch (error) {
+        console.error("Error al guardar el producto:", error);
+        alert("Ocurrió un error al subir las imágenes o guardar en base de datos.");
+    } finally {
+        if (btnSave) {
+            btnSave.disabled = false;
+            btnSave.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Guardar Producto`;
+        }
+    }
 }
 </script>
 <body>
@@ -1411,6 +1545,12 @@ function saveProduct(e) {
                     </div>
 
                     <div class="form-group">
+                        <label>Imágenes del Producto</label>
+                        <input type="file" id="prod-imagenes" accept="image/*" multiple onchange="handleImagePreview(event)" style="background: #242424; border: 1px solid #333; padding: 10px; border-radius: 6px; color: #fff;">
+                        <div id="product-images-preview" class="img-preview-container"></div>
+                    </div>
+
+                    <div class="form-group">
                         <label>Precio ($) *</label>
                         <input type="number" id="prod-precio" placeholder="Ej: 3800">
                     </div>
@@ -1443,7 +1583,7 @@ function saveProduct(e) {
                         <button type="button" class="dropdown-item-btn" style="text-align: center; justify-content: center;" onclick="closeAddProductModal()">
                             Cancelar
                         </button>
-                        <button type="submit" class="btn-dropdown-action" style="padding: 12px;">
+                        <button type="submit" id="btn-submit-product" class="btn-dropdown-action" style="padding: 12px;">
                             <i class="fa-solid fa-floppy-disk"></i> Guardar Producto
                         </button>
                     </div>
