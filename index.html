@@ -1215,20 +1215,23 @@
             <!-- Menú Lateral del Panel -->
             <aside class="admin-sidebar">
                 <div class="admin-brand" onclick="navigateTo('/')">
-                    <i class="fa-solid fa-cube"></i> Forja 3D <span>Admin</span>
+                    <i class="fa-solid fa-cube"></i> Forja 3D <span>Panel de Control</span>
                 </div>
                 <nav class="admin-nav">
                     <button class="admin-nav-item active" onclick="switchAdminTab('tab-productos', this)">
-                        <i class="fa-solid fa-box-open"></i> Productos y Stock
+                        <i class="fa-solid fa-box-open"></i> Productos
                     </button>
-                    <button class="admin-nav-item" onclick="switchAdminTab('tab-nuevo-producto', this)">
-                        <i class="fa-solid fa-square-plus"></i> Cargar Producto
+                    <button class="admin-nav-item" onclick="switchAdminTab('tab-colores', this)">
+                        <i class="fa-solid fa-palette"></i> Colores
+                    </button>
+                    <button class="admin-nav-item" onclick="switchAdminTab('tab-categorias', this)">
+                        <i class="fa-solid fa-layer-group"></i> Categorías
                     </button>
                     <button class="admin-nav-item" onclick="switchAdminTab('tab-pedidos', this)">
                         <i class="fa-solid fa-receipt"></i> Pedidos
                     </button>
-                    <button class="admin-nav-item" onclick="switchAdminTab('tab-usuarios', this)">
-                        <i class="fa-solid fa-users"></i> Usuarios y Puntos
+                    <button class="admin-nav-item" onclick="switchAdminTab('tab-personal', this)">
+                        <i class="fa-solid fa-users"></i> Personal
                     </button>
                 </nav>
                 <div class="admin-sidebar-footer">
@@ -1241,11 +1244,11 @@
             <!-- Área Principal del Panel -->
             <section class="admin-content">
                 
-                <!-- Pestaña 1: Inventario de Productos -->
+                <!-- Pestaña 1: Productos -->
                 <div id="tab-productos" class="admin-tab-content">
                     <div class="admin-header">
                         <h2><i class="fa-solid fa-boxes-stacked" style="color: var(--primary);"></i> Gestión de Productos</h2>
-                        <button class="btn-dropdown-action" style="width: auto; padding: 10px 20px;" onclick="switchAdminTab('tab-nuevo-producto', document.querySelectorAll('.admin-nav-item')[1])">
+                        <button class="btn-dropdown-action" style="width: auto; padding: 10px 20px;" onclick="switchAdminTab('tab-nuevo-producto', null)">
                             <i class="fa-solid fa-plus"></i> Nuevo Producto
                         </button>
                     </div>
@@ -1320,7 +1323,7 @@
                     </div>
                 </div>
 
-                <!-- Pestaña 2: Cargar/Editar Producto -->
+                <!-- Cargar Nuevo Producto (Subpestaña) -->
                 <div id="tab-nuevo-producto" class="admin-tab-content view-hidden">
                     <div class="admin-header">
                         <h2><i class="fa-solid fa-square-plus" style="color: var(--primary);"></i> Cargar Nuevo Producto</h2>
@@ -1374,7 +1377,29 @@
                     </form>
                 </div>
 
-                <!-- Pestaña 3: Pedidos -->
+                <!-- Pestaña 2: Colores -->
+                <div id="tab-colores" class="admin-tab-content view-hidden">
+                    <div class="admin-header">
+                        <h2><i class="fa-solid fa-palette" style="color: var(--primary);"></i> Gestión de Colores</h2>
+                    </div>
+                    <div class="admin-placeholder-box">
+                        <i class="fa-solid fa-fill-drip" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 12px;"></i>
+                        <p>Sección para administrar la paleta de colores de filamentos y resinas disponibles.</p>
+                    </div>
+                </div>
+
+                <!-- Pestaña 3: Categorías -->
+                <div id="tab-categorias" class="admin-tab-content view-hidden">
+                    <div class="admin-header">
+                        <h2><i class="fa-solid fa-layer-group" style="color: var(--primary);"></i> Gestión de Categorías</h2>
+                    </div>
+                    <div class="admin-placeholder-box">
+                        <i class="fa-solid fa-tags" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 12px;"></i>
+                        <p>Sección para agregar, editar o eliminar categorías del catálogo.</p>
+                    </div>
+                </div>
+
+                <!-- Pestaña 4: Pedidos -->
                 <div id="tab-pedidos" class="admin-tab-content view-hidden">
                     <div class="admin-header">
                         <h2><i class="fa-solid fa-receipt" style="color: var(--primary);"></i> Registro de Pedidos</h2>
@@ -1385,14 +1410,14 @@
                     </div>
                 </div>
 
-                <!-- Pestaña 4: Usuarios y Puntos -->
-                <div id="tab-usuarios" class="admin-tab-content view-hidden">
+                <!-- Pestaña 5: Personal -->
+                <div id="tab-personal" class="admin-tab-content view-hidden">
                     <div class="admin-header">
-                        <h2><i class="fa-solid fa-users" style="color: var(--primary);"></i> Clientes y Puntos Forja</h2>
+                        <h2><i class="fa-solid fa-users" style="color: var(--primary);"></i> Gestión de Personal</h2>
                     </div>
                     <div class="admin-placeholder-box">
-                        <i class="fa-solid fa-id-card" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 12px;"></i>
-                        <p>Administrá la lista de usuarios registrados, asigná puntos manualmente o promové cuentas a Administradores.</p>
+                        <i class="fa-solid fa-user-shield" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 12px;"></i>
+                        <p>Administración del equipo, roles de usuario y permisos de administradores.</p>
                     </div>
                 </div>
 
